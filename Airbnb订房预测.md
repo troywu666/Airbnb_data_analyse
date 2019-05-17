@@ -102,17 +102,17 @@ def feature_barplot(feature, df_train = train, df_test = test, figsize=(10,5), r
     feat_train = df_train[feature].value_counts()
     feat_test = df_test[feature].value_counts()
     
-    fig_feature, (axis1,axis2) = plt.subplots(1,2,sharex=True, sharey = True, figsize = figsize)
+    fig_feature, (ax1,ax2) = plt.subplots(1,2,sharex=True, sharey = True, figsize = figsize)
 
-    sns.barplot(feat_train.index.values, feat_train.values, ax = axis1)
-    sns.barplot(feat_test.index.values, feat_test.values, ax = axis2)
+    sns.barplot(feat_train.index.values, feat_train.values, ax = ax1)
+    sns.barplot(feat_test.index.values, feat_test.values, ax = ax2)
     
-    axis1.set_xticklabels(axis1.xaxis.get_majorticklabels(), rotation = rot)
-    axis2.set_xticklabels(axis1.xaxis.get_majorticklabels(), rotation = rot)
+    ax1.set_xticklabels(ax1.xaxis.get_majorticklabels(), rotation = rot)
+    ax2.set_xticklabels(ax1.xaxis.get_majorticklabels(), rotation = rot)
 
-    axis1.set_title(feature + ' of training dataset')
-    axis2.set_title(feature + ' of test dataset')
-    axis1.set_ylabel('Counts')
+    ax1.set_title(feature + ' of train dataset')
+    ax2.set_title(feature + ' of test dataset')
+    ax1.set_ylabel('counts')
     
     plt.tight_layout()
     
@@ -120,5 +120,20 @@ for feat in cate_feats:
     feature_barplot(feature = feat)
 ```
 ###1.2、session datasets
+```python
+df_session['id']=df_session['user_id']
+df_session.drop(['user_id'],axis=1)
+
+df_session.shape
+
+df_session.isnull().sum()
+
+df_session.action=df_session.action.fillna('NAN')
+df_session.action_type=df_session.action_type.fillna('NAN')
+df_session.action_detail=df_session.action_detail.fillna('NAN')
+
+act=dict(zip(*np.unique(df_session.action,return_counts=True)))
+df_session.action=df_session.action.map(lambda x: 'OTHER' if act[x]<100 else x)
+```
 ---
 ## 2、Feature Enginnering
