@@ -131,9 +131,58 @@ df_session.isnull().sum()
 df_session.action=df_session.action.fillna('NAN')
 df_session.action_type=df_session.action_type.fillna('NAN')
 df_session.action_detail=df_session.action_detail.fillna('NAN')
+##将数据中的空值进行处理
 
 act=dict(zip(*np.unique(df_session.action,return_counts=True)))
 df_session.action=df_session.action.map(lambda x: 'OTHER' if act[x]<100 else x)
+##将数量较少的数据合并成‘OTHER’
+
+dgr_session=df_session.groupby(['id'])
+##将session的数据按id进行合并
+
+for i in dgr_session:
+    m=i[1].action.values
+    print(m)
+    print(f_act[m[8]])
+    break
+##透过print看数据结构
+
+f_act=df_session.action.value_counts().argsort()
+f_act_detail = df_session.action_detail.value_counts().argsort()
+f_act_type = df_session.action_type.value_counts().argsort()
+f_dev_type = df_session.device_type.value_counts().argsort()
+##将values进行排序
+```
+* 对session的数据进行建模
+```python
+samples=[]
+cont=0
+ln=len(dgr_session)
+
+for g in dgr_session:
+    if cont%10000==0:
+        print('%s from %s'%(cont,ln))
+    gr=g[1]
+    l=[]
+    l.append(g[0])
+    l.append(len(gr))
+    sev=gr.secs_elapsed.fillna(0).values
+    
+    c_act=[0]*len(df_session.action.value_counts())
+    for i,v in enumerate(gr.action.values):
+        c_act[f_act[v]]+=1
+    _,c_act_uqc=np.unique(gr.action.values,return_counts=True)
+    c_act+=[len(c_act_uqc),np.mean(c_act_uqc),np.std(c_act_uqc)]
+    l+=c_act
+    
+    c_act_detail = [0] * len(f_act_detail)
+    for i,v in enumerate(gr.action_detail.values):
+        c_act_detail[f_act_detail[v]] += 1 
+    _, c_act_det_uqc = np.unique(gr.action_detail.values, return_counts=True)
+    c_act_detail += [len(c_act_det_uqc), np.mean(c_act_det_uqc), np.std(c_act_det_uqc)]
+    l = l + c_act_detail
+    
+    cont+=1
 ```
 ---
 ## 2、Feature Enginnering
