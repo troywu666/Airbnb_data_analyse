@@ -168,21 +168,63 @@ for g in dgr_session:
     l.append(len(gr))
     sev=gr.secs_elapsed.fillna(0).values
     
-    c_act=[0]*len(df_session.action.value_counts())
+    c_act=[0]*len(f_act)
     for i,v in enumerate(gr.action.values):
         c_act[f_act[v]]+=1
     _,c_act_uqc=np.unique(gr.action.values,return_counts=True)
     c_act+=[len(c_act_uqc),np.mean(c_act_uqc),np.std(c_act_uqc)]
-    l+=c_act
+    l=l+c_act
     
     c_act_detail = [0] * len(f_act_detail)
     for i,v in enumerate(gr.action_detail.values):
         c_act_detail[f_act_detail[v]] += 1 
     _, c_act_det_uqc = np.unique(gr.action_detail.values, return_counts=True)
     c_act_detail += [len(c_act_det_uqc), np.mean(c_act_det_uqc), np.std(c_act_det_uqc)]
-    l = l + c_act_detail
+    l=l+c_act_detail
     
+    c_act_type=[0]*len(f_act_type)
+    l_act_type=[0]*len(f_act_type)
+    for i,v in enumerate(gr.action_type.values):
+        c_act_type[f_act_type[v]]+=1
+        l_act_type[f_act_type[v]]+=sev[i]
+    l_act_type=np.log(1+np.array(l_act_type)).tolist()
+    _, c_act_type_uqc = np.unique(gr.action_type.values, return_counts=True)
+    c_act_type += [len(c_act_type_uqc), np.mean(c_act_type_uqc), np.std(c_act_type_uqc)]
+    l=l+c_act_type+l_act_type
+    
+    c_dev_type=[0]*len(f_dev_type)
+    for i,v in enumerate(gr.device_type.values):
+        c_dev_type[f_dev_type[v]]+=1
+    _, c_dev_type_uqc=np.unique(gr.device_type.values,return_counts=True)
+    c_dev_type+=[len(c_dev_type_uqc),np.mean(c_dev_type_uqc),np.std(c_dev_type_uqc)]
+    l=l+c_dev_type
+    
+    l_secs=[0]*5
+    l_log=[0]*15
+    if len(sev)>0:
+        l_secs[0]=np.log(1+np.sum(sev))
+        l_secs[1]=np.log(1+np.mean(sev))
+        l_secs[2]=np.log(1+np.std(sev))
+        l_secs[3]=np.log(1+np.median(sev))
+        l_secs[4]=l_secs[0]/float(l[1])
+    
+        log_sev=np.log(1+sev).astype(int)
+        l_log=np.bincount(log_sev,minlength=15).tolist()
+    l=l+l_secs+l_log
+    
+    samples.append(l)
     cont+=1
+
+samples=np.array(samples)
+samp_ar=samples[:,1:].astype(np.float16)##将数据改为浮点型
+samp_id=samples[:,0]
+
+col_names=[]
+for i in range(len(samples[0])-1):
+    col_names.append('c_'+str(i))
+df_agg_sess=pd.DataFrame(samp_ar,columns=col_names)##构造用户数据矩阵
+df_agg_sess['id']=samp_id
+df_agg_sess.index=df_agg_sess.id
 ```
 ---
 ## 2、Feature Enginnering
