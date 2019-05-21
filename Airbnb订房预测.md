@@ -5,7 +5,7 @@
 ---
 
 ## 1、Data Exploration
-###1.1、training datasets and test datasets
+### 1.1、training datasets and test datasets
 ```python
 import numpy as np
 import pandas as pd
@@ -28,7 +28,7 @@ print(train.isnull().sum(),'\n',test.isnull().sum())
 print(train.shape,test.shape)
 ##训练集：(213451, 16)，测试集： (62096, 15)
 ```
-#### Explore Each Feature
+#### Explore the Feature
 #### 1.1.1、data_account_created
 ```python
 dac_train=train.date_account_created.value_counts()
@@ -119,7 +119,7 @@ def feature_barplot(feature, df_train = train, df_test = test, figsize=(10,5), r
 for feat in cate_feats:
     feature_barplot(feature = feat)
 ```
-###1.2、session datasets
+### 1.2、session datasets
 ```python
 df_session['id']=df_session['user_id']
 df_session.drop(['user_id'],axis=1)
@@ -228,3 +228,58 @@ df_agg_sess.index=df_agg_sess.id
 ```
 ---
 ## 2、Feature Enginnering
+```python
+train=pd.read_csv('train_users_2.csv')
+test=pd.read_csv('test_users.csv')
+
+labels=train.country_destination.values
+id_test=test['id'].values
+id_test
+
+train.head()
+
+test.head()
+
+train.drop(['country_destination','date_first_booking'],axis=1,inplace=True)
+test.drop(['date_first_booking'],axis=1,inplace=True)
+df=pd.concat([train,test],axis=0,ignore_index=True)
+df
+```
+### 2.1、time_stamp_first_active
+```python
+tfa=df.timestamp_first_active.apply(lambda x : datetime.datetime.strptime( str(x) ,'%Y%m%d%H%M%S'))
+tfa.head()
+
+df['tfa_year']=np.array([x.year for x in tfa])
+df['tfa_month']=np.array([x.month for x in tfa])
+df['tfa_day']=np.array([x.day for x in tfa])
+
+##创建星期数据
+df['tfa_wd']=np.array([x.isoweekday() for x in tfa])
+df_tfa_wd=pd.get_dummies(df.tfa_wd,prefix='tfa_wd')
+df=pd.concat([df,df_tfa_wd],axis=1)
+
+df.drop('tfa_wd',axis=1,inplace=True)
+
+##创造季节数据
+Y=2016
+seasons={(date(Y,1,1),date(Y,3,20)):0,
+        (date(Y,3,21),date(Y,6,20)):1,
+        (date(Y,6,21),date(Y,9,20)):2,
+        (date(Y,9,21),date(Y,12,20)):3,
+        (date(Y,12,21),date(Y,12,31)):0}
+tfa=tfa.apply(lambda x : x.date().replace(year=Y))
+
+tfa_season=tfa.map(lambda x : next(values for (key1,key2),values in seasons.items() if key1<= x <=key2))
+
+##不用next函数会导致无法迭代
+
+df['tfa_season']=tfa_season
+df_tfa_season=pd.get_dummies(df.tfa_season,prefix='tfa_season')
+df=pd.concat([df,df_tfa_season],axis=1)
+df.drop('tfa_season',axis=1,inplace=True)
+```
+### 2.2、date_account_created
+```oython
+
+```
