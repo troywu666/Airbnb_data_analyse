@@ -268,9 +268,9 @@ seasons={(date(Y,1,1),date(Y,3,20)):0,
         (date(Y,6,21),date(Y,9,20)):2,
         (date(Y,9,21),date(Y,12,20)):3,
         (date(Y,12,21),date(Y,12,31)):0}
-tfa=tfa.apply(lambda x : x.date().replace(year=Y))
+tfa_year=tfa.apply(lambda x : x.date().replace(year=Y))
 
-tfa_season=tfa.map(lambda x : next(values for (key1,key2),values in seasons.items() if key1<= x <=key2))
+tfa_season=tfa_year.map(lambda x : next(values for (key1,key2),values in seasons.items() if key1<= x <=key2))
 
 ##不用next函数会导致无法迭代
 
@@ -280,6 +280,159 @@ df=pd.concat([df,df_tfa_season],axis=1)
 df.drop('tfa_season',axis=1,inplace=True)
 ```
 ### 2.2、date_account_created
-```oython
+```python
+Y=2016
+seasons={(date(Y,1,1),date(Y,3,20)):0,
+        (date(Y,3,21),date(Y,6,20)):1,
+        (date(Y,6,21),date(Y,9,20)):2,
+        (date(Y,9,21),date(Y,12,20)):3,
+        (date(Y,12,21),date(Y,12,31)):0}
 
+dac=pd.to_datetime(df.date_account_created)
+dac_year=dac.apply(lambda x: x.date().replace(year=Y))
+dac_season=dac_sea.apply(lambda x : next(values for (key1,key2),values in seasons.items() if key1<=x<=key2))
+
+df['dac_year']=np.array([x.year for x in dac])
+df['dac_month']=np.array([x.month for x in dac])
+df['dac_day']=np.array([x.day for x in dac])
+df['dac_wd']=np.array([x.isoweekday() for x in dac])
+df_dac_wd=pd.get_dummies(df.dac_wd,prefix='dac_wd')
+df.drop('dac_wd',axis=1,inplace=True)
+
+df['dac_season']=dac_season
+df_dac_season=pd.get_dummies(df.dac_season,prefix='dac_season')
+df.drop('dac_season',axis=1,inplace=True)
+
+df=pd.concat([df,df_dac_wd,df_dac_season],axis=1)
+df.head()
 ```
+### 2.3、time span between dac and tfa
+```python
+print(dac.dtype,tfa.dtype)
+dt_span = dac.subtract(tfa).dt.days
+dt_span.head()
+
+plt.scatter(dt_span.value_counts().index.values,dt_span.value_counts().values)
+
+def get_span(dt):
+    if dt==-1:
+        return 'OneDay'
+    elif -1<dt<=31:
+        return 'OneMonth'
+    elif 31<dt<365:
+        return 'OneYear'
+    else:
+        return 'Other'
+
+df['span']=np.array([get_span(i) for i in dt_span])
+df_span=pd.get_dummies(df.span,prefix='span')
+df=pd.concat([df,df_span],axis=1)
+df.drop('span',axis=1,inplace=True)
+df.head()
+
+df.drop(['date_account_created','timestamp_first_active'],axis=1,inplace=True)
+```
+### 2.3、age
+```python
+av=df.age
+av.head()
+
+age_values=av.apply(lambda x: np.where(x>1900,2019-x,x))
+age_values=age_values.apply(lambda x: np.where(x>=132,-1,x))
+
+age_values.fillna(-1,inplace=True)
+
+def get_age(age):
+    if age<0:
+        return 'NA'
+    elif 0<age<=18:
+        return 'Juvenile'
+    elif 18<age<=40:
+        return 'Youth'
+    elif 40<age<=66:
+        return 'Middlescent'
+    else:
+        return 'Senium'
+
+age_type=age_values.apply(lambda x : get_age(x))
+
+age_type
+
+df['age_type']=age_type
+age_types=pd.get_dummies(df.age_type,prefix='age_type')
+df=pd.concat([df,age_types],axis=1)
+df.drop(['age','age_type'],axis=1,inplace=True)
+```
+### 2.4、categorical features
+```python
+feat_toOHE = ['gender', 
+             'signup_method', 
+             'signup_flow', 
+             'language', 
+             'affiliate_channel', 
+             'affiliate_provider', 
+             'first_affiliate_tracked', 
+             'signup_app', 
+             'first_device_type', 
+             'first_browser']
+for i in feat_toOHE:
+    df_toOHE=pd.get_dummies(df[i],prefix=i,dummy_na=True)
+    df=pd.concat((df,df_toOHE),axis=1)
+    df.drop(i,axis=1,inplace=True)
+```
+### 2.5、merge with session
+```python
+df_all=pd.merge(df,df_agg_sess,on='id',how='left')
+##以左边表格的id为主id，右边表格作匹配
+
+---------------------------------------------------------------
+###对merge函数作讲解
+data=DataFrame([{"id":0,"name":'lxh',"age":20,"cp":'lm'},{"id":1,"name":'xiao',"age":40,"cp":'ly'},{"id":2,"name":'hua',"age":4,"cp":'yry'},{"id":3,"name":'be',"age":70,"cp":'old'}])
+data1=DataFrame([{"id":100,"name":'lxh','cs':10},{"id":101,"name":'xiao','cs':40},{"id":102,"name":'hua2','cs':50}])
+data2=DataFrame([{"id":0,"name":'lxh','cs':10},{"id":101,"name":'xiao','cs':40},{"id":102,"name":'hua2','cs':50}])
+
+print(data)
+print(data1)
+print(data2)
+
+print "单个列名做为内链接的连接键\r\n",merge(data,data1,on="name",suffixes=('_a','_b'))
+print "多列名做为内链接的连接键\r\n",merge(data,data2,on=("name","id"))
+print '不指定on则以两个DataFrame的列名交集做为连接键\r\n',merge(data,data2) #这里使用了id与name
+
+#使用右边的DataFrame的行索引做为连接键
+##设置行索引名称
+indexed_data1=data1.set_index("name")
+print "使用右边的DataFrame的行索引做为连接键\r\n",merge(data,indexed_data1,left_on='name',right_index=True)
+
+print('左外连接\r\n',merge(data,data1,on="name",how="left",suffixes=('_a','_b')))
+print('左外连接1\r\n',merge(data1,data,on="name",how="left"))
+print('右外连接\r\n',merge(data,data1,on="name",how="right"))
+data3=DataFrame([{"mid":0,"mname":'lxh','cs':10},{"mid":101,"mname":'xiao','cs':40},{"mid":102,"mname":'hua2','cs':50}])
+
+#当左右两个DataFrame的列名不同，当又想做为连接键时可以使用left_on与right_on来指定连接键
+print("使用left_on与right_on来指定列名字不同的连接键\r\n",merge(data,data3,left_on=["name","id"],right_on=["mname","mid"]))
+##
+---------------------------------------------------------------
+
+df_all.fillna(-2,inplace=True)
+
+df_all.drop('id',axis=1,inplace=True)
+```
+### 2.6、split train and test datasets
+```python
+Xtrain=df_all.iloc[:train_row,:]
+Xtest=df_all.iloc[train_row:,:]
+
+Xtrain.to_csv('Airbnb_xtrain.csv')
+Xtest.to_csv('Airbnb_xtest.csv')
+##存成文件，下次可以直接调用
+
+le=LabelEncoder()
+le.fit(labels)
+ytrain=le.transform(labels)
+
+labels.tofile('Airbnb_ytrain.csv',sep='\n',format='%s')
+##sep='\n'是为了让数据存储时换行
+```
+---
+## 3、Modeling
