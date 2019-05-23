@@ -436,3 +436,115 @@ labels.tofile('Airbnb_ytrain.csv',sep='\n',format='%s')
 ```
 ---
 ## 3、Modeling
+```python
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+%matplotlib inline
+import seaborn as sns
+import pickle
+import datetime
+import sklearn as sk
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import LabelBinarizer
+
+xtrain=pd.read_csv('Airbnb_xtrain.csv',index_col=False)
+xtest=pd.read_csv('Airbnb_xtest.csv',index_col=False)
+## index_col=False可以保证读取数据时不会使用第一列做index，因为默认读取时会使用第一列做index
+
+ytrain=pd.read_csv('Airbnb_ytrain.csv',header=None)
+## header=None可以保证读取数据时不会使用第一行的数据做column，因为默认读取时会使用第一行做column
+
+xtrain.head()
+
+xtest.head()
+
+ytrain.head()
+
+ytrain.values
+
+np.unique(ytrain.values)
+
+from sklearn.preprocessing import LabelEncoder
+le=LabelEncoder()
+le.fit(ytrain.values.ravel())
+ytrain_le=le.transform(ytrain.values.ravel())
+##在对一列数据做LabelEncoder时，会导致出现warning，使用ravel（）可以规范使用！！！否则后悔debug会很惨！！！
+
+X_Scaler=StandardScaler()
+xtrain_new_stdsca=X_Scaler.fit_transform(xtrain_new.astype('float64'))
+##若不使用astype('float64'),会产生warning，因为传入的是int类型数据
+```
+### 3.1、Airbnb Evalution:NDCG
+```python
+from sklearn.metrics import make_scorer
+from sklearn.preprocessing import LabelBinarizer
+
+def dcg_socre(y_true,y_score,k=5):
+    '''
+    y_true: array,shape= [n_samples]
+        true relevance labels
+    y_score: array,shape= [n_samples]
+        predicted scores
+    k: int
+    '''
+    order=np.arsort(y_score)[::-1]
+    y_true=np.take(y_true,order[:k])
+    
+    gain=2**y_true - 1
+    discounts=np.log2(np.arange(len(y_true))+2)
+    return np.sum(gain/discounts)
+
+def ndcg(ground_truth,predictions,k=5):
+    lb=LabelBinarizer()
+    lb.fit(range(len(predictions)+1))
+    T=lb.transform(ground_truth)
+    ##把ground_truth进行binarizar的好处是，计算dcg_score时不会被原有的打分所影响
+    
+    scores=[]
+    
+    for y_true,y_score in zip(T,predictions):
+        actual=dcg_score(y_true,y_score,k)
+        best=dcg_score(y_true,y_true,k)
+        score=float(actual)/float(best)
+        scores.append(score)
+        
+        return np.mean(scores)
+```
+### 3.2、logistic regression
+```python
+from sklearn.linear_model import LogisticRegression as lg
+
+lr=lg(C=1.0,penalty='l2',solver='newton-cg',multi_class='multinomial')
+## 1、solver=‘newton_cg’可以指定优化方法（例子中指定为牛顿法），不指定时会有warning出现
+## 2、multi_class='multinomial'可以指定分类方法（例子中指定为多分类），不指定时会有warning出现
+
+from sklearn.model_selection import KFold, train_test_split, cross_val_score
+
+randomstate=2019
+
+kf=KFold(n_splits=5,random_state=randomstate)
+
+train_score=[]
+test_score=[]
+
+k_ndcg=11
+
+for train_index,test_index in kf.split(xtrain_new_stdsca,ytrain_le_new):
+    x_train,x_test=xtrain_new_stdsca[train_index,:],xtrain_new_stdsca[test_index,:]
+    y_train,y_test=ytrain_le_new[train_index],ytrain_le_new[test_index]
+    
+    print(x_train.shape,x_test.shape)
+    
+    lr.fit(x_train,y_train)
+    y_pred=lr.predict_proba(x_test)
+    
+    train_ndcg_score=ndcg(y_train,lr.predict_proba(x_train),k=k_ndcg)
+    test_ndcg_score=ndcg(y_test,y_pred,k=k_ndcg)
+    
+    train_score.append(train_ndcg_score)
+    test_score.append(test_ndcg_score)
+    
+print('Training ndcg scoring is ',np.mean(train_score))
+print('Testing ndcg scoring is ',np.mean(test_score))
+```
