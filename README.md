@@ -548,3 +548,142 @@ for train_index,test_index in kf.split(xtrain_new_stdsca,ytrain_le_new):
 print('Training ndcg scoring is ',np.mean(train_score))
 print('Testing ndcg scoring is ',np.mean(test_score))
 ```
+* 改变迭代次数，看拟合效果
+```python
+from sklearn.linear_model import LogisticRegression as lg
+
+iteration=[1,20,30,40,50,100]
+
+train_score=[]
+test_score=[]
+
+kf=KFold(n_splits=5,random_state=2017)
+
+k_ndcg=11
+
+for max_iter in iteration:
+    lr=lg(solver='newton-cg',multi_class='multinomial',max_iter=max_iter)
+    
+    train_iter_score=[]
+    test_iter_score=[]
+    
+    print('The max_iter is %s'%(max_iter))
+    
+    for train_index,test_index in kf.split(xtrain_new_stdsca,ytrain_le_new):
+        x_train,x_test=xtrain_new_stdsca[train_index,:],xtrain_new_stdsca[test_index,:]
+        y_train,y_test=ytrain_le_new[train_index],ytrain_le_new[test_index]
+
+        lr.fit(x_train,y_train)
+        y_pred=lr.predict_proba(x_test)
+    
+        train_ndcg_score=ndcg(y_train,lr.predict_proba(x_train),k=k_ndcg)
+        test_ndcg_score=ndcg(y_test,y_pred,k=k_ndcg)
+    
+        train_iter_score.append(train_ndcg_score)
+        test_iter_score.append(test_ndcg_score)
+    
+    train_score.append(np.mean(train_iter_score))
+    test_score.append(np.mean(test_iter_score))
+    print('Training ndcg scoring is ',np.mean(train_iter_score))
+    print('Testing ndcg scoring is ',np.mean(test_iter_score),'.\n')
+    ##加上\n可以换行，方便查看
+
+ymin=np.min(cv_score)-0.05
+ymax=1
+
+plt.plot(iteration,train_score,'ro-',label='training')
+plt.plot(iteration,cv_score,'b*-',label='cross-validation')
+plt.ylabel('Score')
+plt.xlabel('iterations')
+plt.plot(np.linspace(20,20,50),np.linspace(ymin,ymax,50),'g--')
+plt.xlim(-5,np.max(iteration)+5)
+plt.ylim(ymin,ymax)
+plt.legend(loc='lower right',fontsize=12)
+plt.title('Learning Curve')
+for a,b in zip(iteration,train_score):
+    plt.text(a, b+0.025, '%.1f'%(b), ha='center', va= 'bottom',fontsize=12)
+for a,b in zip(iteration,cv_score):
+    plt.text(a,b+0.025,'%.1f'%(b),ha='center',va='bottom',fontsize=12)
+##  ha='center', va= 'bottom'代表 horizontalalignment（水平对齐）、verticalalignment（垂直对齐）的方式
+plt.tight_layout()
+```
+### 3.3、Tree methods
+集成不同 数模型的训练效果
+```python
+from sklearn.ensemble import AdaBoostClassifier,GradientBoostingClassifier,ExtraTreesClassifier,RandomForestClassifier,BaggingClassifier
+from sklearn.tree import DecisionTreeClassifier
+
+learning_rate=0.1
+n_estimators=50
+random_state=2019
+max_depth=9
+
+clf_tree={
+    'DTree':DecisionTreeClassifier(max_depth=max_depth,
+                                  random_state=random_state),
+    'Bagging':BaggingClassifier(n_estimators=n_estimators,
+                               random_state=random_state),
+    'RF':RandomForestClassifier(max_depth=max_depth,
+                               random_state=random_state,
+                               n_estimators=n_estimators),
+    'ExtraTree':ExtraTreesClassifier(max_depth=max_depth,
+                                   n_estimators=n_estimators,
+                                   random_state=random_state),
+    'AdaBoost':AdaBoostClassifier(n_estimators=n_estimators,
+                                 random_state=random_state,
+                                 learning_rate=learning_rate),
+    'GraBoost':GradientBoostingClassifier(n_estimators=n_estimators,
+                                      random_state=random_state,
+                                      learning_rate=learning_rate,
+                                      max_depth=max_depth)
+}
+
+for keys in clf_tree.keys():
+    print(clf_tree[keys])
+
+train_score=[]
+cv_score=[]
+
+k_ndcg=11
+
+kf=KFold(n_splits=5,random_state=2019)
+
+for keys in clf_tree.keys():
+    clf=clf_tree[keys]
+    print('%s'%(clf))
+    train_iter_score=[]
+    cv_iter_score=[]
+    for train_index,test_index in kf.split(xtrain_new_stdsca,ytrain_le_new):
+        x_train,x_test=xtrain_new_stdsca[train_index,:],xtrain_new_stdsca[test_index]
+        y_train,y_test=ytrain_le_new[train_index],ytrain_le_new[test_index]
+        
+        clf.fit(x_train,y_train)
+        y_pred=clf.predict_proba(x_test)
+        
+        train_ndcg_score=ndcg(y_train,clf.predict_proba(x_train),k=k_ndcg)
+        ##这里不能写ndcg(y_train,y_train)
+        cv_ndcg_score=ndcg(y_test,y_pred,k=k_ndcg)
+        
+        train_iter_score.append(train_ndcg_score)
+        cv_iter_score.append(cv_ndcg_score)
+        
+    train_score.append(np.mean(train_iter_score))
+    cv_score.append(np.mean(cv_iter_score))
+    
+    print('The train_score is %s.'%(np.mean(train_iter_score)))
+    print('The cv_socre is %s.\n'%(np.mean(cv_iter_score)))
+
+plt.plot(clf_tree.keys(),train_score,'ro-',label='training')
+plt.plot(clf_tree.keys(),cv_score,'b*-',label='cross-validation')
+plt.xlabel('Tree-methods')
+plt.ylabel('Scoring')
+plt.ylim(np.min(train_score)-0.05,np.max(train_score)+0.05)
+plt.title('Different tree methods')
+plt.legend(loc='best',fontsize=12)
+for a,b in zip(clf_tree.keys(),train_score):
+    plt.text(a,b+0.025,'%.3f'%(b),ha='center',va='bottom',fontsize=12)
+for a,b in zip(clf_tree.keys(),cv_score):
+    plt.text(a,b+0.025,'%.3f'%(b),ha='center',va='bottom',fontsize=12)
+plt.tight_layout()
+```
+由图可看出，Bagging默认是决策树作为基分类器
