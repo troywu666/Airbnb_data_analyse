@@ -871,61 +871,6 @@ for feat in cate_feats:
 ![png](output_21_9.png)
 
 
-
-```python
-from pandas import Series,DataFrame,merge
-import numpy as np
-data=DataFrame([{"id":0,"name":'lxh',"age":20,"cp":'lm'},{"id":1,"name":'xiao',"age":40,"cp":'ly'},{"id":2,"name":'hua',"age":4,"cp":'yry'},{"id":3,"name":'be',"age":70,"cp":'old'}])
-data1=DataFrame([{"id":100,"name":'lxh','cs':10},{"id":101,"name":'xiao','cs':40},{"id":102,"name":'hua2','cs':50}])
-data2=DataFrame([{"id":0,"name":'lxh','cs':10},{"id":101,"name":'xiao','cs':40},{"id":102,"name":'hua2','cs':50}])
-
-print(data)
-print(data1)
-print(data2)
-
-print('左外连接\r\n',merge(data,data1,on="name",how="left",suffixes=('_a','_b')))
-print('左外连接1\r\n',merge(data1,data,on="name",how="left"))
-print('右外连接\r\n',merge(data,data1,on="name",how="right"))
-data3=DataFrame([{"mid":0,"mname":'lxh','cs':10},{"mid":101,"mname":'xiao','cs':40},{"mid":102,"mname":'hua2','cs':50}])
-
-#当左右两个DataFrame的列名不同，当又想做为连接键时可以使用left_on与right_on来指定连接键
-print("使用left_on与right_on来指定列名字不同的连接键\r\n",merge(data,data3,left_on=["name","id"],right_on=["mname","mid"]))
-```
-
-       age   cp  id  name
-    0   20   lm   0   lxh
-    1   40   ly   1  xiao
-    2    4  yry   2   hua
-    3   70  old   3    be
-       cs   id  name
-    0  10  100   lxh
-    1  40  101  xiao
-    2  50  102  hua2
-       cs   id  name
-    0  10    0   lxh
-    1  40  101  xiao
-    2  50  102  hua2
-    左外连接
-        age   cp  id_a  name    cs   id_b
-    0   20   lm     0   lxh  10.0  100.0
-    1   40   ly     1  xiao  40.0  101.0
-    2    4  yry     2   hua   NaN    NaN
-    3   70  old     3    be   NaN    NaN
-    左外连接1
-        cs  id_x  name   age   cp  id_y
-    0  10   100   lxh  20.0   lm   0.0
-    1  40   101  xiao  40.0   ly   1.0
-    2  50   102  hua2   NaN  NaN   NaN
-    右外连接
-         age   cp  id_x  name  cs  id_y
-    0  20.0   lm   0.0   lxh  10   100
-    1  40.0   ly   1.0  xiao  40   101
-    2   NaN  NaN   NaN  hua2  50   102
-    使用left_on与right_on来指定列名字不同的连接键
-        age  cp  id name  cs  mid mname
-    0   20  lm   0  lxh  10    0   lxh
-    
-
 # Featur Enginnering
 
 
@@ -962,7 +907,7 @@ print(df_session.columns)
 
 ```python
 for i in df_session.columns:
-    print(df_session[i].value_counts(),end='')
+    print(df_session[i].value_counts().head())
 ```
 
     vcmr2jh5ix    2085
@@ -970,274 +915,43 @@ for i in df_session.columns:
     qkbkunyzq7    1780
     s5ez13snz0    1685
     bp4mwnlbxs    1526
-    jastc45uok    1518
-    tu41qoa28z    1410
-    wrccc4m1uw    1390
-    k3w4kskp4o    1382
-    ca8jmor156    1254
-    9zh7tdb4jr    1250
-    fm89u29kv7    1185
-    dzhwxl5uie    1184
-    a30puilbmc    1182
-    ytplei6boz    1182
-    337zc4etfh    1169
-    kquztvwe0z    1075
-    mpzaszcsz1    1010
-    66kf2va3x5     974
-    edkc9jwn5x     968
-    3jg5g7my08     950
-    jvo4exq16y     932
-    18caw1xkx8     925
-    8ntgnjd9cd     919
-    x9041dfqiy     919
-    fnrvq97pza     917
-    g6qpp37geu     912
-    xcbi3btmys     903
-    k6b12i0h6i     895
-    mutgv0rnlv     861
-                  ... 
-    e5eloizbtf       1
-    yy92qrdvvu       1
-    j8z9jmgjqd       1
-    vkpk4qpa56       1
-    e8d3p4movg       1
-    nzs7nwwc61       1
-    ewr433sb8k       1
-    yqwivtv5mf       1
-    d8rix1ykp3       1
-    7pb6pzye9v       1
-    pm3vo68idk       1
-    jxdfl1ivgr       1
-    czmlukokqd       1
-    vxsj0dzmlo       1
-    00allnceb8       1
-    zarw54uo0a       1
-    d1tvltza6y       1
-    w5sn4qqiav       1
-    4lk7nq2787       1
-    e7l7yocdtk       1
-    76nx0wo5cm       1
-    uurhc8enxu       1
-    4thcdh53ai       1
-    qn3ch4jn4m       1
-    8berog06n8       1
-    v1uj5kqc4t       1
-    udop8qxc6b       1
-    aywa1qjb05       1
-    iautm4zc0h       1
-    26smaxc0bi       1
-    Name: user_id, Length: 15588, dtype: int64show                               209655
-    search_results                     109430
-    personalize                        105718
-    lookup                              88302
-    ajax_refresh_subtotal               71482
-    index                               69441
-    similar_listings                    53814
-    update                              38829
-    search                              26520
-    header_userpic                      17332
-    create                              17262
-    track_page_view                     17089
-    active                              15855
-    social_connections                  15301
-    collections                         12763
-    dashboard                            9535
-    calendar_tab_inner2                  9353
-    ajax_check_dates                     8387
-    edit                                 7716
-    confirm_email                        7424
-    ask_question                         6994
-    requested                            6242
-    authenticate                         6021
-    other_hosting_reviews_first          5934
-    show_personalize                     5542
-    ajax_lwlb_contact                    5042
-    reviews                              4704
-    unavailabilities                     4702
-    qt2                                  4537
-    listings                             4327
-                                        ...  
-    zendesk_login_jwt                       4
-    slideshow                               3
-    travel                                  3
-    press_news                              3
-    message                                 3
-    locations                               3
-    office_location                         3
-    home_safety_landing                     2
-    update_reservation_requirements         2
-    has_profile_pic                         2
-    load_more                               2
-    create_ach                              2
-    life                                    2
-    locale_from_host                        2
-    reservation                             2
-    how_it_works                            2
-    media_resources                         1
-    departments                             1
-    recommendation_page                     1
-    sublets                                 1
-    wishlists                               1
-    maybe_information                       1
-    photography_update                      1
-    relationship                            1
-    change_default_payout                   1
-    satisfy                                 1
-    southern-europe                         1
-    feed                                    1
-    guest_billing_receipt                   1
-    localized                               1
-    Name: action, Length: 244, dtype: int64view                247360
-    click               241418
-    data                221806
-    -unknown-           102925
-    submit               76292
-    message_post         12363
-    booking_request       2393
-    partner_callback       920
-    booking_response         1
-    Name: action_type, dtype: int64view_search_results              186546
-    wishlist_content_update          111091
-    -unknown-                        102925
-    p3                               101173
-    change_trip_characteristics       75227
-    similar_listings                  56544
-    update_listing                    32605
-    user_profile                      26772
-    header_userpic                    18323
-    user_wishlists                    16505
-    user_social_connections           15852
-    contact_host                      12713
-    message_post                      12363
-    message_thread                    10409
-    dashboard                         10060
-    change_contact_host_dates          8798
-    create_user                        8492
-    edit_profile                       8070
-    confirm_email_link                 7790
-    login                              6208
-    user_profile_content_update        5799
-    p5                                 5047
-    unavailable_dates                  4829
-    create_phone_numbers               4656
-    listing_reviews                    3799
-    update_listing_description         3614
-    your_listings                      3307
-    your_trips                         3093
-    update_user_profile                2904
-    user_listings                      2488
-                                      ...  
-    guest_cancellation                   57
-    set_password                         56
-    host_home                            52
-    translations                         52
-    request_to_book                      48
-    host_guarantee                       42
-    forgot_password                      42
-    your_reservations                    41
-    guest_receipt                        35
-    airbnb_picks_wishlists               33
-    alteration_field                     27
-    previous_trips                       24
-    toggle_starred_thread                20
-    admin_templates                      19
-    user_friend_recommendations          17
-    remove_dashboard_alert               17
-    set_password_page                    15
-    change_password                      14
-    confirm_email                        14
-    place_worth                          13
-    calculate_worth                      12
-    translate_listing_reviews            11
-    delete_listing                        8
-    alteration_request                    5
-    respond_to_alteration_request         4
-    homepage                              4
-    create_alteration_request             3
-    complete_booking                      2
-    booking                               1
-    delete_listing_description            1
-    Name: action_detail, Length: 107, dtype: int64Mac Desktop                         478574
+    Name: user_id, dtype: int64
+    show                     209655
+    search_results           109430
+    personalize              105718
+    lookup                    88302
+    ajax_refresh_subtotal     71482
+    Name: action, dtype: int64
+    view         247360
+    click        241418
+    data         221806
+    -unknown-    102925
+    submit        76292
+    Name: action_type, dtype: int64
+    view_search_results            186546
+    wishlist_content_update        111091
+    -unknown-                      102925
+    p3                             101173
+    change_trip_characteristics     75227
+    Name: action_detail, dtype: int64
+    Mac Desktop                         478574
     Windows Desktop                     326346
     Android App Unknown Phone/Tablet     98002
     iPad Tablet                          72071
     iPhone                               43406
-    -unknown-                            16245
-    Tablet                                5322
-    Linux Desktop                         3552
-    Chromebook                            3075
-    Android Phone                         1606
-    iPodtouch                              289
-    Blackberry                              53
-    Windows Phone                           29
-    Opera Phone                              5
-    Name: device_type, dtype: int640.0          7222
-    4.0          1920
-    3.0          1913
-    1.0          1844
-    2.0          1842
-    6.0          1812
-    5.0          1794
-    9.0          1792
-    7.0          1784
-    8.0          1772
-    23.0         1734
-    11.0         1727
-    14.0         1713
-    10.0         1713
-    13.0         1704
-    15.0         1693
-    20.0         1679
-    18.0         1660
-    19.0         1648
-    17.0         1646
-    12.0         1641
-    33.0         1621
-    27.0         1618
-    25.0         1602
-    16.0         1599
-    28.0         1598
-    21.0         1596
-    30.0         1584
-    39.0         1583
-    37.0         1582
-                 ... 
-    286501.0        1
-    1146046.0       1
-    286514.0        1
-    102184.0        1
-    71631.0         1
-    1146103.0       1
-    286530.0        1
-    71633.0         1
-    71634.0         1
-    71635.0         1
-    1145879.0       1
-    71615.0         1
-    147184.0        1
-    1145816.0       1
-    286367.0        1
-    71593.0         1
-    71594.0         1
-    286378.0        1
-    71598.0         1
-    286406.0        1
-    71602.0         1
-    286417.0        1
-    120964.0        1
-    71605.0         1
-    71606.0         1
-    286426.0        1
-    71607.0         1
-    71608.0         1
-    71613.0         1
-    260982.0        1
-    Name: secs_elapsed, Length: 114422, dtype: int64
+    Name: device_type, dtype: int64
+    0.0    7222
+    4.0    1920
+    3.0    1913
+    1.0    1844
+    2.0    1842
+    Name: secs_elapsed, dtype: int64
+    
 
 
 ```python
 df_session['id']=df_session['user_id']
-df_session.drop(['user_id'],axis=1)
+df_session.drop(['user_id'],axis=1).head()
 ```
 
 
@@ -1315,513 +1029,8 @@ df_session.drop(['user_id'],axis=1)
       <td>957.0</td>
       <td>jpmpj40cvk</td>
     </tr>
-    <tr>
-      <th>5</th>
-      <td>search_results</td>
-      <td>click</td>
-      <td>view_search_results</td>
-      <td>Windows Desktop</td>
-      <td>965.0</td>
-      <td>jpmpj40cvk</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>search_results</td>
-      <td>click</td>
-      <td>view_search_results</td>
-      <td>Windows Desktop</td>
-      <td>1021.0</td>
-      <td>jpmpj40cvk</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>search_results</td>
-      <td>click</td>
-      <td>view_search_results</td>
-      <td>Windows Desktop</td>
-      <td>938.0</td>
-      <td>jpmpj40cvk</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>search_results</td>
-      <td>click</td>
-      <td>view_search_results</td>
-      <td>Windows Desktop</td>
-      <td>2702.0</td>
-      <td>jpmpj40cvk</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>ajax_refresh_subtotal</td>
-      <td>click</td>
-      <td>change_trip_characteristics</td>
-      <td>Windows Desktop</td>
-      <td>674.0</td>
-      <td>jpmpj40cvk</td>
-    </tr>
-    <tr>
-      <th>10</th>
-      <td>show</td>
-      <td>click</td>
-      <td>view_search_results</td>
-      <td>Windows Desktop</td>
-      <td>52.0</td>
-      <td>jpmpj40cvk</td>
-    </tr>
-    <tr>
-      <th>11</th>
-      <td>lookup</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>Windows Desktop</td>
-      <td>826.0</td>
-      <td>jpmpj40cvk</td>
-    </tr>
-    <tr>
-      <th>12</th>
-      <td>search_results</td>
-      <td>click</td>
-      <td>view_search_results</td>
-      <td>Windows Desktop</td>
-      <td>2470.0</td>
-      <td>jpmpj40cvk</td>
-    </tr>
-    <tr>
-      <th>13</th>
-      <td>lookup</td>
-      <td>view</td>
-      <td>view_search_results</td>
-      <td>Windows Desktop</td>
-      <td>309.0</td>
-      <td>jpmpj40cvk</td>
-    </tr>
-    <tr>
-      <th>14</th>
-      <td>search_results</td>
-      <td>click</td>
-      <td>view_search_results</td>
-      <td>Windows Desktop</td>
-      <td>1548.0</td>
-      <td>jpmpj40cvk</td>
-    </tr>
-    <tr>
-      <th>15</th>
-      <td>lookup</td>
-      <td>click</td>
-      <td>change_trip_characteristics</td>
-      <td>Windows Desktop</td>
-      <td>374.0</td>
-      <td>jpmpj40cvk</td>
-    </tr>
-    <tr>
-      <th>16</th>
-      <td>search_results</td>
-      <td>click</td>
-      <td>view_search_results</td>
-      <td>Windows Desktop</td>
-      <td>24499.0</td>
-      <td>jpmpj40cvk</td>
-    </tr>
-    <tr>
-      <th>17</th>
-      <td>ajax_refresh_subtotal</td>
-      <td>click</td>
-      <td>change_trip_characteristics</td>
-      <td>Windows Desktop</td>
-      <td>373.0</td>
-      <td>jpmpj40cvk</td>
-    </tr>
-    <tr>
-      <th>18</th>
-      <td>show</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>Windows Desktop</td>
-      <td>78.0</td>
-      <td>jpmpj40cvk</td>
-    </tr>
-    <tr>
-      <th>19</th>
-      <td>personalize</td>
-      <td>data</td>
-      <td>wishlist_content_update</td>
-      <td>Windows Desktop</td>
-      <td>759.0</td>
-      <td>jpmpj40cvk</td>
-    </tr>
-    <tr>
-      <th>20</th>
-      <td>show</td>
-      <td>view</td>
-      <td>p3</td>
-      <td>Windows Desktop</td>
-      <td>433.0</td>
-      <td>jpmpj40cvk</td>
-    </tr>
-    <tr>
-      <th>21</th>
-      <td>show</td>
-      <td>view</td>
-      <td>p3</td>
-      <td>Windows Desktop</td>
-      <td>525040.0</td>
-      <td>jpmpj40cvk</td>
-    </tr>
-    <tr>
-      <th>22</th>
-      <td>ajax_refresh_subtotal</td>
-      <td>click</td>
-      <td>change_trip_characteristics</td>
-      <td>Windows Desktop</td>
-      <td>1607.0</td>
-      <td>jpmpj40cvk</td>
-    </tr>
-    <tr>
-      <th>23</th>
-      <td>show</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>Windows Desktop</td>
-      <td>167.0</td>
-      <td>jpmpj40cvk</td>
-    </tr>
-    <tr>
-      <th>24</th>
-      <td>personalize</td>
-      <td>data</td>
-      <td>wishlist_content_update</td>
-      <td>Windows Desktop</td>
-      <td>657.0</td>
-      <td>jpmpj40cvk</td>
-    </tr>
-    <tr>
-      <th>25</th>
-      <td>show</td>
-      <td>view</td>
-      <td>p3</td>
-      <td>Windows Desktop</td>
-      <td>32965.0</td>
-      <td>jpmpj40cvk</td>
-    </tr>
-    <tr>
-      <th>26</th>
-      <td>index</td>
-      <td>view</td>
-      <td>view_search_results</td>
-      <td>Windows Desktop</td>
-      <td>24670.0</td>
-      <td>jpmpj40cvk</td>
-    </tr>
-    <tr>
-      <th>27</th>
-      <td>similar_listings</td>
-      <td>data</td>
-      <td>similar_listings</td>
-      <td>Windows Desktop</td>
-      <td>193.0</td>
-      <td>jpmpj40cvk</td>
-    </tr>
-    <tr>
-      <th>28</th>
-      <td>personalize</td>
-      <td>data</td>
-      <td>wishlist_content_update</td>
-      <td>Windows Desktop</td>
-      <td>1193.0</td>
-      <td>jpmpj40cvk</td>
-    </tr>
-    <tr>
-      <th>29</th>
-      <td>confirm_email</td>
-      <td>click</td>
-      <td>confirm_email_link</td>
-      <td>Windows Desktop</td>
-      <td>1198189.0</td>
-      <td>7jxkifmj7m</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>1048545</th>
-      <td>search_results</td>
-      <td>click</td>
-      <td>view_search_results</td>
-      <td>Windows Desktop</td>
-      <td>94424.0</td>
-      <td>piwqqc0x1m</td>
-    </tr>
-    <tr>
-      <th>1048546</th>
-      <td>search_results</td>
-      <td>click</td>
-      <td>view_search_results</td>
-      <td>Windows Desktop</td>
-      <td>37260.0</td>
-      <td>piwqqc0x1m</td>
-    </tr>
-    <tr>
-      <th>1048547</th>
-      <td>show</td>
-      <td>view</td>
-      <td>p3</td>
-      <td>Windows Desktop</td>
-      <td>142048.0</td>
-      <td>piwqqc0x1m</td>
-    </tr>
-    <tr>
-      <th>1048548</th>
-      <td>show</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>Windows Desktop</td>
-      <td>1531.0</td>
-      <td>piwqqc0x1m</td>
-    </tr>
-    <tr>
-      <th>1048549</th>
-      <td>show</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>Windows Desktop</td>
-      <td>17.0</td>
-      <td>piwqqc0x1m</td>
-    </tr>
-    <tr>
-      <th>1048550</th>
-      <td>personalize</td>
-      <td>data</td>
-      <td>wishlist_content_update</td>
-      <td>Windows Desktop</td>
-      <td>1144.0</td>
-      <td>piwqqc0x1m</td>
-    </tr>
-    <tr>
-      <th>1048551</th>
-      <td>personalize</td>
-      <td>data</td>
-      <td>wishlist_content_update</td>
-      <td>Windows Desktop</td>
-      <td>17.0</td>
-      <td>piwqqc0x1m</td>
-    </tr>
-    <tr>
-      <th>1048552</th>
-      <td>ajax_refresh_subtotal</td>
-      <td>click</td>
-      <td>change_trip_characteristics</td>
-      <td>Windows Desktop</td>
-      <td>935.0</td>
-      <td>piwqqc0x1m</td>
-    </tr>
-    <tr>
-      <th>1048553</th>
-      <td>similar_listings</td>
-      <td>data</td>
-      <td>similar_listings</td>
-      <td>Windows Desktop</td>
-      <td>120.0</td>
-      <td>piwqqc0x1m</td>
-    </tr>
-    <tr>
-      <th>1048554</th>
-      <td>index</td>
-      <td>view</td>
-      <td>view_search_results</td>
-      <td>Windows Desktop</td>
-      <td>31964.0</td>
-      <td>piwqqc0x1m</td>
-    </tr>
-    <tr>
-      <th>1048555</th>
-      <td>show</td>
-      <td>view</td>
-      <td>p3</td>
-      <td>Windows Desktop</td>
-      <td>29940.0</td>
-      <td>piwqqc0x1m</td>
-    </tr>
-    <tr>
-      <th>1048556</th>
-      <td>show</td>
-      <td>view</td>
-      <td>p3</td>
-      <td>Windows Desktop</td>
-      <td>18525.0</td>
-      <td>piwqqc0x1m</td>
-    </tr>
-    <tr>
-      <th>1048557</th>
-      <td>listings</td>
-      <td>-unknown-</td>
-      <td>-unknown-</td>
-      <td>Windows Desktop</td>
-      <td>155.0</td>
-      <td>piwqqc0x1m</td>
-    </tr>
-    <tr>
-      <th>1048558</th>
-      <td>ajax_refresh_subtotal</td>
-      <td>click</td>
-      <td>change_trip_characteristics</td>
-      <td>Windows Desktop</td>
-      <td>567.0</td>
-      <td>piwqqc0x1m</td>
-    </tr>
-    <tr>
-      <th>1048559</th>
-      <td>similar_listings</td>
-      <td>data</td>
-      <td>similar_listings</td>
-      <td>Windows Desktop</td>
-      <td>87.0</td>
-      <td>piwqqc0x1m</td>
-    </tr>
-    <tr>
-      <th>1048560</th>
-      <td>show</td>
-      <td>view</td>
-      <td>p3</td>
-      <td>Windows Desktop</td>
-      <td>89106.0</td>
-      <td>piwqqc0x1m</td>
-    </tr>
-    <tr>
-      <th>1048561</th>
-      <td>personalize</td>
-      <td>data</td>
-      <td>wishlist_content_update</td>
-      <td>Windows Desktop</td>
-      <td>1389.0</td>
-      <td>piwqqc0x1m</td>
-    </tr>
-    <tr>
-      <th>1048562</th>
-      <td>show</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>Windows Desktop</td>
-      <td>67.0</td>
-      <td>piwqqc0x1m</td>
-    </tr>
-    <tr>
-      <th>1048563</th>
-      <td>ajax_refresh_subtotal</td>
-      <td>click</td>
-      <td>change_trip_characteristics</td>
-      <td>Windows Desktop</td>
-      <td>1225.0</td>
-      <td>piwqqc0x1m</td>
-    </tr>
-    <tr>
-      <th>1048564</th>
-      <td>search_results</td>
-      <td>click</td>
-      <td>view_search_results</td>
-      <td>Windows Desktop</td>
-      <td>70147.0</td>
-      <td>piwqqc0x1m</td>
-    </tr>
-    <tr>
-      <th>1048565</th>
-      <td>show</td>
-      <td>view</td>
-      <td>p3</td>
-      <td>Windows Desktop</td>
-      <td>61159.0</td>
-      <td>piwqqc0x1m</td>
-    </tr>
-    <tr>
-      <th>1048566</th>
-      <td>show</td>
-      <td>view</td>
-      <td>p3</td>
-      <td>Windows Desktop</td>
-      <td>52.0</td>
-      <td>piwqqc0x1m</td>
-    </tr>
-    <tr>
-      <th>1048567</th>
-      <td>similar_listings</td>
-      <td>data</td>
-      <td>similar_listings</td>
-      <td>Windows Desktop</td>
-      <td>241.0</td>
-      <td>piwqqc0x1m</td>
-    </tr>
-    <tr>
-      <th>1048568</th>
-      <td>show</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>Windows Desktop</td>
-      <td>1248.0</td>
-      <td>piwqqc0x1m</td>
-    </tr>
-    <tr>
-      <th>1048569</th>
-      <td>show</td>
-      <td>view</td>
-      <td>p3</td>
-      <td>Mac Desktop</td>
-      <td>32674.0</td>
-      <td>em1hg8l6k8</td>
-    </tr>
-    <tr>
-      <th>1048570</th>
-      <td>personalize</td>
-      <td>data</td>
-      <td>wishlist_content_update</td>
-      <td>Mac Desktop</td>
-      <td>1658.0</td>
-      <td>em1hg8l6k8</td>
-    </tr>
-    <tr>
-      <th>1048571</th>
-      <td>show</td>
-      <td>view</td>
-      <td>p3</td>
-      <td>Mac Desktop</td>
-      <td>6941.0</td>
-      <td>em1hg8l6k8</td>
-    </tr>
-    <tr>
-      <th>1048572</th>
-      <td>personalize</td>
-      <td>data</td>
-      <td>wishlist_content_update</td>
-      <td>Mac Desktop</td>
-      <td>4161.0</td>
-      <td>em1hg8l6k8</td>
-    </tr>
-    <tr>
-      <th>1048573</th>
-      <td>similar_listings</td>
-      <td>data</td>
-      <td>similar_listings</td>
-      <td>Mac Desktop</td>
-      <td>166.0</td>
-      <td>em1hg8l6k8</td>
-    </tr>
-    <tr>
-      <th>1048574</th>
-      <td>index</td>
-      <td>view</td>
-      <td>view_search_results</td>
-      <td>Mac Desktop</td>
-      <td>11680.0</td>
-      <td>em1hg8l6k8</td>
-    </tr>
   </tbody>
 </table>
-<p>1048575 rows × 6 columns</p>
 </div>
 
 
@@ -1891,74 +1100,23 @@ for i in dgr_session:
 
 
 ```python
-df_session.action.value_counts()
+df_session.action.value_counts().head(10)
 ```
 
 
 
 
-    show                              209655
-    search_results                    109430
-    personalize                       105718
-    lookup                             88302
-    ajax_refresh_subtotal              71482
-    index                              69441
-    similar_listings                   53814
-    update                             38829
-    search                             26520
-    header_userpic                     17332
-    create                             17262
-    track_page_view                    17089
-    active                             15855
-    social_connections                 15301
-    collections                        12763
-    dashboard                           9535
-    calendar_tab_inner2                 9353
-    ajax_check_dates                    8387
-    NAN                                 7873
-    edit                                7716
-    confirm_email                       7424
-    ask_question                        6994
-    requested                           6242
-    authenticate                        6021
-    other_hosting_reviews_first         5934
-    show_personalize                    5542
-    ajax_lwlb_contact                   5042
-    reviews                             4704
-    unavailabilities                    4702
-    qt2                                 4537
-                                       ...  
-    tos_confirm                          309
-    decision_tree                        308
-    ajax_statsd                          307
-    12                                   282
-    login                                276
-    recent_reservations                  272
-    status                               270
-    tell_a_friend                        247
-    phone_verification_modal             227
-    transaction_history_paginated        221
-    10                                   200
-    qt_with                              194
-    referrer_status                      189
-    supported                            176
-    update_notifications                 176
-    contact_new                          175
-    add_note                             161
-    popular                              155
-    create_multiple                      153
-    remove_dashboard_alert               144
-    other_hosting_reviews                142
-    listing                              136
-    pending_tickets                      136
-    authorize                            127
-    itinerary                            127
-    glob                                 119
-    ajax_payout_options_by_country       115
-    transaction_history                  113
-    pay                                  104
-    ajax_payout_edit                     103
-    Name: action, Length: 117, dtype: int64
+    show                     209655
+    search_results           109430
+    personalize              105718
+    lookup                    88302
+    ajax_refresh_subtotal     71482
+    index                     69441
+    similar_listings          53814
+    update                    38829
+    search                    26520
+    header_userpic            17332
+    Name: action, dtype: int64
 
 
 
@@ -2387,7 +1545,7 @@ test.head()
 train.drop(['country_destination','date_first_booking'],axis=1,inplace=True)
 test.drop(['date_first_booking'],axis=1,inplace=True)
 df=pd.concat([train,test],axis=0,ignore_index=True)
-df
+df.head()
 ```
 
 
@@ -2513,961 +1671,8 @@ df
       <td>Mac Desktop</td>
       <td>Chrome</td>
     </tr>
-    <tr>
-      <th>5</th>
-      <td>osr2jwljor</td>
-      <td>2010-01-01</td>
-      <td>20100101215619</td>
-      <td>-unknown-</td>
-      <td>NaN</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>other</td>
-      <td>other</td>
-      <td>omg</td>
-      <td>Web</td>
-      <td>Mac Desktop</td>
-      <td>Chrome</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>lsw9q7uk0j</td>
-      <td>2010-01-02</td>
-      <td>20100102012558</td>
-      <td>FEMALE</td>
-      <td>46.0</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>other</td>
-      <td>craigslist</td>
-      <td>untracked</td>
-      <td>Web</td>
-      <td>Mac Desktop</td>
-      <td>Safari</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>0d01nltbrs</td>
-      <td>2010-01-03</td>
-      <td>20100103191905</td>
-      <td>FEMALE</td>
-      <td>47.0</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>direct</td>
-      <td>direct</td>
-      <td>omg</td>
-      <td>Web</td>
-      <td>Mac Desktop</td>
-      <td>Safari</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>a1vcnhxeij</td>
-      <td>2010-01-04</td>
-      <td>20100104004211</td>
-      <td>FEMALE</td>
-      <td>50.0</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>other</td>
-      <td>craigslist</td>
-      <td>untracked</td>
-      <td>Web</td>
-      <td>Mac Desktop</td>
-      <td>Safari</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>6uh8zyj2gn</td>
-      <td>2010-01-04</td>
-      <td>20100104023758</td>
-      <td>-unknown-</td>
-      <td>46.0</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>other</td>
-      <td>craigslist</td>
-      <td>omg</td>
-      <td>Web</td>
-      <td>Mac Desktop</td>
-      <td>Firefox</td>
-    </tr>
-    <tr>
-      <th>10</th>
-      <td>yuuqmid2rp</td>
-      <td>2010-01-04</td>
-      <td>20100104194251</td>
-      <td>FEMALE</td>
-      <td>36.0</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>other</td>
-      <td>craigslist</td>
-      <td>untracked</td>
-      <td>Web</td>
-      <td>Mac Desktop</td>
-      <td>Firefox</td>
-    </tr>
-    <tr>
-      <th>11</th>
-      <td>om1ss59ys8</td>
-      <td>2010-01-05</td>
-      <td>20100105051812</td>
-      <td>FEMALE</td>
-      <td>47.0</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>other</td>
-      <td>craigslist</td>
-      <td>untracked</td>
-      <td>Web</td>
-      <td>iPhone</td>
-      <td>-unknown-</td>
-    </tr>
-    <tr>
-      <th>12</th>
-      <td>k6np330cm1</td>
-      <td>2010-01-05</td>
-      <td>20100105060859</td>
-      <td>-unknown-</td>
-      <td>NaN</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>direct</td>
-      <td>direct</td>
-      <td>NaN</td>
-      <td>Web</td>
-      <td>Other/Unknown</td>
-      <td>-unknown-</td>
-    </tr>
-    <tr>
-      <th>13</th>
-      <td>dy3rgx56cu</td>
-      <td>2010-01-05</td>
-      <td>20100105083259</td>
-      <td>FEMALE</td>
-      <td>37.0</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>other</td>
-      <td>craigslist</td>
-      <td>linked</td>
-      <td>Web</td>
-      <td>Mac Desktop</td>
-      <td>Firefox</td>
-    </tr>
-    <tr>
-      <th>14</th>
-      <td>ju3h98ch3w</td>
-      <td>2010-01-07</td>
-      <td>20100107055820</td>
-      <td>FEMALE</td>
-      <td>36.0</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>other</td>
-      <td>craigslist</td>
-      <td>untracked</td>
-      <td>Web</td>
-      <td>iPhone</td>
-      <td>Mobile Safari</td>
-    </tr>
-    <tr>
-      <th>15</th>
-      <td>v4d5rl22px</td>
-      <td>2010-01-07</td>
-      <td>20100107204555</td>
-      <td>FEMALE</td>
-      <td>33.0</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>direct</td>
-      <td>direct</td>
-      <td>untracked</td>
-      <td>Web</td>
-      <td>Windows Desktop</td>
-      <td>Chrome</td>
-    </tr>
-    <tr>
-      <th>16</th>
-      <td>2dwbwkx056</td>
-      <td>2010-01-07</td>
-      <td>20100107215125</td>
-      <td>-unknown-</td>
-      <td>NaN</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>other</td>
-      <td>craigslist</td>
-      <td>NaN</td>
-      <td>Web</td>
-      <td>Other/Unknown</td>
-      <td>-unknown-</td>
-    </tr>
-    <tr>
-      <th>17</th>
-      <td>frhre329au</td>
-      <td>2010-01-07</td>
-      <td>20100107224625</td>
-      <td>-unknown-</td>
-      <td>31.0</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>other</td>
-      <td>craigslist</td>
-      <td>NaN</td>
-      <td>Web</td>
-      <td>Other/Unknown</td>
-      <td>-unknown-</td>
-    </tr>
-    <tr>
-      <th>18</th>
-      <td>cxlg85pg1r</td>
-      <td>2010-01-08</td>
-      <td>20100108015641</td>
-      <td>-unknown-</td>
-      <td>NaN</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>seo</td>
-      <td>facebook</td>
-      <td>NaN</td>
-      <td>Web</td>
-      <td>Other/Unknown</td>
-      <td>-unknown-</td>
-    </tr>
-    <tr>
-      <th>19</th>
-      <td>gdka1q5ktd</td>
-      <td>2010-01-10</td>
-      <td>20100110010817</td>
-      <td>FEMALE</td>
-      <td>29.0</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>direct</td>
-      <td>direct</td>
-      <td>untracked</td>
-      <td>Web</td>
-      <td>Mac Desktop</td>
-      <td>Chrome</td>
-    </tr>
-    <tr>
-      <th>20</th>
-      <td>qdubonn3uk</td>
-      <td>2010-01-10</td>
-      <td>20100110152120</td>
-      <td>-unknown-</td>
-      <td>NaN</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>direct</td>
-      <td>direct</td>
-      <td>NaN</td>
-      <td>Web</td>
-      <td>Other/Unknown</td>
-      <td>-unknown-</td>
-    </tr>
-    <tr>
-      <th>21</th>
-      <td>qsibmuz9sx</td>
-      <td>2010-01-10</td>
-      <td>20100110220941</td>
-      <td>MALE</td>
-      <td>30.0</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>direct</td>
-      <td>direct</td>
-      <td>linked</td>
-      <td>Web</td>
-      <td>Mac Desktop</td>
-      <td>Chrome</td>
-    </tr>
-    <tr>
-      <th>22</th>
-      <td>80f7dwscrn</td>
-      <td>2010-01-11</td>
-      <td>20100111031438</td>
-      <td>-unknown-</td>
-      <td>40.0</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>seo</td>
-      <td>google</td>
-      <td>untracked</td>
-      <td>Web</td>
-      <td>iPhone</td>
-      <td>-unknown-</td>
-    </tr>
-    <tr>
-      <th>23</th>
-      <td>jha93x042q</td>
-      <td>2010-01-11</td>
-      <td>20100111224015</td>
-      <td>-unknown-</td>
-      <td>NaN</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>other</td>
-      <td>craigslist</td>
-      <td>untracked</td>
-      <td>Web</td>
-      <td>Mac Desktop</td>
-      <td>Safari</td>
-    </tr>
-    <tr>
-      <th>24</th>
-      <td>7i49vnuav6</td>
-      <td>2010-01-11</td>
-      <td>20100111230808</td>
-      <td>FEMALE</td>
-      <td>40.0</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>seo</td>
-      <td>google</td>
-      <td>untracked</td>
-      <td>Web</td>
-      <td>Mac Desktop</td>
-      <td>Firefox</td>
-    </tr>
-    <tr>
-      <th>25</th>
-      <td>al8bcetz0g</td>
-      <td>2010-01-12</td>
-      <td>20100112131444</td>
-      <td>FEMALE</td>
-      <td>26.0</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>other</td>
-      <td>craigslist</td>
-      <td>untracked</td>
-      <td>Web</td>
-      <td>Mac Desktop</td>
-      <td>Chrome</td>
-    </tr>
-    <tr>
-      <th>26</th>
-      <td>bjg0m5otl3</td>
-      <td>2010-01-12</td>
-      <td>20100112155420</td>
-      <td>-unknown-</td>
-      <td>NaN</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>other</td>
-      <td>other</td>
-      <td>untracked</td>
-      <td>Web</td>
-      <td>Other/Unknown</td>
-      <td>-unknown-</td>
-    </tr>
-    <tr>
-      <th>27</th>
-      <td>hfrl5gle36</td>
-      <td>2010-01-12</td>
-      <td>20100112205949</td>
-      <td>FEMALE</td>
-      <td>32.0</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>other</td>
-      <td>craigslist</td>
-      <td>untracked</td>
-      <td>Web</td>
-      <td>Desktop (Other)</td>
-      <td>Chrome</td>
-    </tr>
-    <tr>
-      <th>28</th>
-      <td>tp6x3md0n4</td>
-      <td>2010-01-13</td>
-      <td>20100113044650</td>
-      <td>-unknown-</td>
-      <td>35.0</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>direct</td>
-      <td>direct</td>
-      <td>NaN</td>
-      <td>Web</td>
-      <td>Other/Unknown</td>
-      <td>-unknown-</td>
-    </tr>
-    <tr>
-      <th>29</th>
-      <td>hql77nu2lk</td>
-      <td>2010-01-13</td>
-      <td>20100113064333</td>
-      <td>-unknown-</td>
-      <td>37.0</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>direct</td>
-      <td>direct</td>
-      <td>untracked</td>
-      <td>Web</td>
-      <td>Android Tablet</td>
-      <td>-unknown-</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>275517</th>
-      <td>bsv2ev628t</td>
-      <td>2014-09-30</td>
-      <td>20140930231454</td>
-      <td>-unknown-</td>
-      <td>NaN</td>
-      <td>google</td>
-      <td>12</td>
-      <td>en</td>
-      <td>direct</td>
-      <td>direct</td>
-      <td>untracked</td>
-      <td>Android</td>
-      <td>Android Phone</td>
-      <td>-unknown-</td>
-    </tr>
-    <tr>
-      <th>275518</th>
-      <td>06echc56pl</td>
-      <td>2014-09-30</td>
-      <td>20140930231518</td>
-      <td>FEMALE</td>
-      <td>48.0</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>direct</td>
-      <td>direct</td>
-      <td>untracked</td>
-      <td>Web</td>
-      <td>Mac Desktop</td>
-      <td>Safari</td>
-    </tr>
-    <tr>
-      <th>275519</th>
-      <td>niqgaye2ov</td>
-      <td>2014-09-30</td>
-      <td>20140930231952</td>
-      <td>-unknown-</td>
-      <td>NaN</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>seo</td>
-      <td>google</td>
-      <td>untracked</td>
-      <td>Web</td>
-      <td>Mac Desktop</td>
-      <td>Firefox</td>
-    </tr>
-    <tr>
-      <th>275520</th>
-      <td>61iwzuhw6e</td>
-      <td>2014-09-30</td>
-      <td>20140930232126</td>
-      <td>FEMALE</td>
-      <td>24.0</td>
-      <td>facebook</td>
-      <td>25</td>
-      <td>en</td>
-      <td>direct</td>
-      <td>direct</td>
-      <td>untracked</td>
-      <td>iOS</td>
-      <td>iPhone</td>
-      <td>-unknown-</td>
-    </tr>
-    <tr>
-      <th>275521</th>
-      <td>gks02el96u</td>
-      <td>2014-09-30</td>
-      <td>20140930232237</td>
-      <td>FEMALE</td>
-      <td>32.0</td>
-      <td>facebook</td>
-      <td>0</td>
-      <td>en</td>
-      <td>seo</td>
-      <td>facebook</td>
-      <td>untracked</td>
-      <td>Web</td>
-      <td>iPad</td>
-      <td>Mobile Safari</td>
-    </tr>
-    <tr>
-      <th>275522</th>
-      <td>v4r1161l0r</td>
-      <td>2014-09-30</td>
-      <td>20140930232253</td>
-      <td>-unknown-</td>
-      <td>NaN</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>direct</td>
-      <td>direct</td>
-      <td>untracked</td>
-      <td>Moweb</td>
-      <td>Android Phone</td>
-      <td>Chrome Mobile</td>
-    </tr>
-    <tr>
-      <th>275523</th>
-      <td>p1clbqd0o6</td>
-      <td>2014-09-30</td>
-      <td>20140930232331</td>
-      <td>-unknown-</td>
-      <td>NaN</td>
-      <td>basic</td>
-      <td>23</td>
-      <td>en</td>
-      <td>direct</td>
-      <td>direct</td>
-      <td>untracked</td>
-      <td>Android</td>
-      <td>Android Phone</td>
-      <td>-unknown-</td>
-    </tr>
-    <tr>
-      <th>275524</th>
-      <td>ozb2z0km6l</td>
-      <td>2014-09-30</td>
-      <td>20140930232507</td>
-      <td>-unknown-</td>
-      <td>NaN</td>
-      <td>basic</td>
-      <td>23</td>
-      <td>en</td>
-      <td>direct</td>
-      <td>direct</td>
-      <td>untracked</td>
-      <td>Android</td>
-      <td>Android Phone</td>
-      <td>-unknown-</td>
-    </tr>
-    <tr>
-      <th>275525</th>
-      <td>w3e3sp6i70</td>
-      <td>2014-09-30</td>
-      <td>20140930232551</td>
-      <td>-unknown-</td>
-      <td>NaN</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>direct</td>
-      <td>direct</td>
-      <td>linked</td>
-      <td>Moweb</td>
-      <td>iPhone</td>
-      <td>Mobile Safari</td>
-    </tr>
-    <tr>
-      <th>275526</th>
-      <td>q5bxbq0asg</td>
-      <td>2014-09-30</td>
-      <td>20140930232613</td>
-      <td>FEMALE</td>
-      <td>40.0</td>
-      <td>facebook</td>
-      <td>0</td>
-      <td>en</td>
-      <td>sem-brand</td>
-      <td>google</td>
-      <td>omg</td>
-      <td>Web</td>
-      <td>Windows Desktop</td>
-      <td>Firefox</td>
-    </tr>
-    <tr>
-      <th>275527</th>
-      <td>1xa5t3t0la</td>
-      <td>2014-09-30</td>
-      <td>20140930233113</td>
-      <td>MALE</td>
-      <td>39.0</td>
-      <td>facebook</td>
-      <td>0</td>
-      <td>en</td>
-      <td>seo</td>
-      <td>facebook</td>
-      <td>untracked</td>
-      <td>Web</td>
-      <td>iPhone</td>
-      <td>Mobile Safari</td>
-    </tr>
-    <tr>
-      <th>275528</th>
-      <td>zuvz7gfpjz</td>
-      <td>2014-09-30</td>
-      <td>20140930233305</td>
-      <td>-unknown-</td>
-      <td>NaN</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>seo</td>
-      <td>google</td>
-      <td>untracked</td>
-      <td>Web</td>
-      <td>Mac Desktop</td>
-      <td>Firefox</td>
-    </tr>
-    <tr>
-      <th>275529</th>
-      <td>gpusl6ppgf</td>
-      <td>2014-09-30</td>
-      <td>20140930233535</td>
-      <td>-unknown-</td>
-      <td>NaN</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>seo</td>
-      <td>google</td>
-      <td>untracked</td>
-      <td>Web</td>
-      <td>iPad</td>
-      <td>Mobile Safari</td>
-    </tr>
-    <tr>
-      <th>275530</th>
-      <td>gpijioh4eh</td>
-      <td>2014-09-30</td>
-      <td>20140930233902</td>
-      <td>MALE</td>
-      <td>44.0</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>seo</td>
-      <td>google</td>
-      <td>linked</td>
-      <td>Web</td>
-      <td>Mac Desktop</td>
-      <td>Chrome</td>
-    </tr>
-    <tr>
-      <th>275531</th>
-      <td>3ptlvdxss9</td>
-      <td>2014-09-30</td>
-      <td>20140930234128</td>
-      <td>-unknown-</td>
-      <td>39.0</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>seo</td>
-      <td>google</td>
-      <td>linked</td>
-      <td>Web</td>
-      <td>Windows Desktop</td>
-      <td>Firefox</td>
-    </tr>
-    <tr>
-      <th>275532</th>
-      <td>f9a1ncjnrg</td>
-      <td>2014-09-30</td>
-      <td>20140930234425</td>
-      <td>FEMALE</td>
-      <td>34.0</td>
-      <td>facebook</td>
-      <td>23</td>
-      <td>en</td>
-      <td>direct</td>
-      <td>direct</td>
-      <td>untracked</td>
-      <td>Android</td>
-      <td>Android Phone</td>
-      <td>-unknown-</td>
-    </tr>
-    <tr>
-      <th>275533</th>
-      <td>kofaz2kh70</td>
-      <td>2014-09-30</td>
-      <td>20140930234515</td>
-      <td>-unknown-</td>
-      <td>NaN</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>seo</td>
-      <td>google</td>
-      <td>untracked</td>
-      <td>Web</td>
-      <td>Mac Desktop</td>
-      <td>Safari</td>
-    </tr>
-    <tr>
-      <th>275534</th>
-      <td>6xrmom7hjo</td>
-      <td>2014-09-30</td>
-      <td>20140930234551</td>
-      <td>MALE</td>
-      <td>40.0</td>
-      <td>facebook</td>
-      <td>23</td>
-      <td>en</td>
-      <td>direct</td>
-      <td>direct</td>
-      <td>untracked</td>
-      <td>Android</td>
-      <td>Android Phone</td>
-      <td>-unknown-</td>
-    </tr>
-    <tr>
-      <th>275535</th>
-      <td>cg9wqgnad2</td>
-      <td>2014-09-30</td>
-      <td>20140930234612</td>
-      <td>MALE</td>
-      <td>27.0</td>
-      <td>facebook</td>
-      <td>0</td>
-      <td>en</td>
-      <td>direct</td>
-      <td>direct</td>
-      <td>untracked</td>
-      <td>Web</td>
-      <td>Mac Desktop</td>
-      <td>Firefox</td>
-    </tr>
-    <tr>
-      <th>275536</th>
-      <td>jg618z94wo</td>
-      <td>2014-09-30</td>
-      <td>20140930234617</td>
-      <td>FEMALE</td>
-      <td>24.0</td>
-      <td>facebook</td>
-      <td>0</td>
-      <td>en</td>
-      <td>direct</td>
-      <td>direct</td>
-      <td>linked</td>
-      <td>Web</td>
-      <td>iPhone</td>
-      <td>Mobile Safari</td>
-    </tr>
-    <tr>
-      <th>275537</th>
-      <td>u7lv3glv6y</td>
-      <td>2014-09-30</td>
-      <td>20140930234703</td>
-      <td>-unknown-</td>
-      <td>NaN</td>
-      <td>basic</td>
-      <td>25</td>
-      <td>en</td>
-      <td>direct</td>
-      <td>direct</td>
-      <td>untracked</td>
-      <td>iOS</td>
-      <td>iPhone</td>
-      <td>-unknown-</td>
-    </tr>
-    <tr>
-      <th>275538</th>
-      <td>o6ofmozucx</td>
-      <td>2014-09-30</td>
-      <td>20140930234751</td>
-      <td>MALE</td>
-      <td>55.0</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>sem-brand</td>
-      <td>google</td>
-      <td>omg</td>
-      <td>Web</td>
-      <td>Windows Desktop</td>
-      <td>Firefox</td>
-    </tr>
-    <tr>
-      <th>275539</th>
-      <td>wcw7xggeqp</td>
-      <td>2014-09-30</td>
-      <td>20140930234904</td>
-      <td>-unknown-</td>
-      <td>34.0</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>direct</td>
-      <td>direct</td>
-      <td>untracked</td>
-      <td>Web</td>
-      <td>Mac Desktop</td>
-      <td>Chrome</td>
-    </tr>
-    <tr>
-      <th>275540</th>
-      <td>m22pw2pkxr</td>
-      <td>2014-09-30</td>
-      <td>20140930235000</td>
-      <td>MALE</td>
-      <td>32.0</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>direct</td>
-      <td>direct</td>
-      <td>linked</td>
-      <td>Web</td>
-      <td>Windows Desktop</td>
-      <td>Chrome</td>
-    </tr>
-    <tr>
-      <th>275541</th>
-      <td>8yvhec201j</td>
-      <td>2014-09-30</td>
-      <td>20140930235019</td>
-      <td>-unknown-</td>
-      <td>NaN</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>seo</td>
-      <td>yahoo</td>
-      <td>linked</td>
-      <td>Web</td>
-      <td>Windows Desktop</td>
-      <td>Chrome</td>
-    </tr>
-    <tr>
-      <th>275542</th>
-      <td>cv0na2lf5a</td>
-      <td>2014-09-30</td>
-      <td>20140930235232</td>
-      <td>-unknown-</td>
-      <td>31.0</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>direct</td>
-      <td>direct</td>
-      <td>untracked</td>
-      <td>Web</td>
-      <td>Windows Desktop</td>
-      <td>IE</td>
-    </tr>
-    <tr>
-      <th>275543</th>
-      <td>zp8xfonng8</td>
-      <td>2014-09-30</td>
-      <td>20140930235306</td>
-      <td>-unknown-</td>
-      <td>NaN</td>
-      <td>basic</td>
-      <td>23</td>
-      <td>ko</td>
-      <td>direct</td>
-      <td>direct</td>
-      <td>untracked</td>
-      <td>Android</td>
-      <td>Android Phone</td>
-      <td>-unknown-</td>
-    </tr>
-    <tr>
-      <th>275544</th>
-      <td>fa6260ziny</td>
-      <td>2014-09-30</td>
-      <td>20140930235408</td>
-      <td>-unknown-</td>
-      <td>NaN</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>de</td>
-      <td>direct</td>
-      <td>direct</td>
-      <td>linked</td>
-      <td>Web</td>
-      <td>Windows Desktop</td>
-      <td>Firefox</td>
-    </tr>
-    <tr>
-      <th>275545</th>
-      <td>87k0fy4ugm</td>
-      <td>2014-09-30</td>
-      <td>20140930235430</td>
-      <td>-unknown-</td>
-      <td>NaN</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>sem-brand</td>
-      <td>google</td>
-      <td>omg</td>
-      <td>Web</td>
-      <td>Mac Desktop</td>
-      <td>Safari</td>
-    </tr>
-    <tr>
-      <th>275546</th>
-      <td>9uqfg8txu3</td>
-      <td>2014-09-30</td>
-      <td>20140930235901</td>
-      <td>FEMALE</td>
-      <td>49.0</td>
-      <td>basic</td>
-      <td>0</td>
-      <td>en</td>
-      <td>other</td>
-      <td>other</td>
-      <td>tracked-other</td>
-      <td>Web</td>
-      <td>Windows Desktop</td>
-      <td>Chrome</td>
-    </tr>
   </tbody>
 </table>
-<p>275547 rows × 14 columns</p>
 </div>
 
 
@@ -3970,7 +2175,7 @@ plt.scatter(dt_span.value_counts().index.values,dt_span.value_counts().values)
 
 
 
-![png](output_60_1.png)
+![png](output_59_1.png)
 
 
 
@@ -4868,6 +3073,32 @@ df.head()
 
 
 ### merge with session
+
+----
+
+
+```python
+### ps： 用法举例
+from pandas import Series,DataFrame,merge
+import numpy as np
+data=DataFrame([{"id":0,"name":'lxh',"age":20,"cp":'lm'},{"id":1,"name":'xiao',"age":40,"cp":'ly'},{"id":2,"name":'hua',"age":4,"cp":'yry'},{"id":3,"name":'be',"age":70,"cp":'old'}])
+data1=DataFrame([{"id":100,"name":'lxh','cs':10},{"id":101,"name":'xiao','cs':40},{"id":102,"name":'hua2','cs':50}])
+data2=DataFrame([{"id":0,"name":'lxh','cs':10},{"id":101,"name":'xiao','cs':40},{"id":102,"name":'hua2','cs':50}])
+
+print(data)
+print(data1)
+print(data2)
+
+print('左外连接\r\n',merge(data,data1,on="name",how="left",suffixes=('_a','_b')))
+print('左外连接1\r\n',merge(data1,data,on="name",how="left"))
+print('右外连接\r\n',merge(data,data1,on="name",how="right"))
+data3=DataFrame([{"mid":0,"mname":'lxh','cs':10},{"mid":101,"mname":'xiao','cs':40},{"mid":102,"mname":'hua2','cs':50}])
+
+#当左右两个DataFrame的列名不同，当又想做为连接键时可以使用left_on与right_on来指定连接键
+print("使用left_on与right_on来指定列名字不同的连接键\r\n",merge(data,data3,left_on=["name","id"],right_on=["mname","mid"]))
+```
+
+---
 
 
 ```python
@@ -5858,7 +4089,7 @@ plt.tight_layout()
 ```
 
 
-![png](output_106_0.png)
+![png](output_108_0.png)
 
 
 ## Tree method
@@ -6029,7 +4260,7 @@ plt.tight_layout()
 ```
 
 
-![png](output_110_0.png)
+![png](output_112_0.png)
 
 
 ### 各种树模型拟合效果对比
@@ -6071,12 +4302,14 @@ for keys in clf_tree.keys():
     print(clf_tree[keys])
 ```
 
-    ExtraTreesClassifier(bootstrap=False, class_weight=None, criterion='gini',
-               max_depth=9, max_features='auto', max_leaf_nodes=None,
-               min_impurity_decrease=0.0, min_impurity_split=None,
-               min_samples_leaf=1, min_samples_split=2,
-               min_weight_fraction_leaf=0.0, n_estimators=50, n_jobs=None,
-               oob_score=False, random_state=2019, verbose=0, warm_start=False)
+    DecisionTreeClassifier(class_weight=None, criterion='gini', max_depth=9,
+                max_features=None, max_leaf_nodes=None,
+                min_impurity_decrease=0.0, min_impurity_split=None,
+                min_samples_leaf=1, min_samples_split=2,
+                min_weight_fraction_leaf=0.0, presort=False, random_state=2019,
+                splitter='best')
+    AdaBoostClassifier(algorithm='SAMME.R', base_estimator=None,
+              learning_rate=0.1, n_estimators=50, random_state=2019)
     GradientBoostingClassifier(criterion='friedman_mse', init=None,
                   learning_rate=0.1, loss='deviance', max_depth=9,
                   max_features=None, max_leaf_nodes=None,
@@ -6086,6 +4319,12 @@ for keys in clf_tree.keys():
                   n_iter_no_change=None, presort='auto', random_state=2019,
                   subsample=1.0, tol=0.0001, validation_fraction=0.1,
                   verbose=0, warm_start=False)
+    ExtraTreesClassifier(bootstrap=False, class_weight=None, criterion='gini',
+               max_depth=9, max_features='auto', max_leaf_nodes=None,
+               min_impurity_decrease=0.0, min_impurity_split=None,
+               min_samples_leaf=1, min_samples_split=2,
+               min_weight_fraction_leaf=0.0, n_estimators=50, n_jobs=None,
+               oob_score=False, random_state=2019, verbose=0, warm_start=False)
     BaggingClassifier(base_estimator=None, bootstrap=True,
              bootstrap_features=False, max_features=1.0, max_samples=1.0,
              n_estimators=50, n_jobs=None, oob_score=False, random_state=2019,
@@ -6097,14 +4336,6 @@ for keys in clf_tree.keys():
                 min_weight_fraction_leaf=0.0, n_estimators=50, n_jobs=None,
                 oob_score=False, random_state=2019, verbose=0,
                 warm_start=False)
-    DecisionTreeClassifier(class_weight=None, criterion='gini', max_depth=9,
-                max_features=None, max_leaf_nodes=None,
-                min_impurity_decrease=0.0, min_impurity_split=None,
-                min_samples_leaf=1, min_samples_split=2,
-                min_weight_fraction_leaf=0.0, presort=False, random_state=2019,
-                splitter='best')
-    AdaBoostClassifier(algorithm='SAMME.R', base_estimator=None,
-              learning_rate=0.1, n_estimators=50, random_state=2019)
     
 
 
@@ -6142,13 +4373,18 @@ for keys in clf_tree.keys():
     print('The cv_socre is %s.\n'%(np.mean(cv_iter_score)))
 ```
 
-    ExtraTreesClassifier(bootstrap=False, class_weight=None, criterion='gini',
-               max_depth=9, max_features='auto', max_leaf_nodes=None,
-               min_impurity_decrease=0.0, min_impurity_split=None,
-               min_samples_leaf=1, min_samples_split=2,
-               min_weight_fraction_leaf=0.0, n_estimators=50, n_jobs=None,
-               oob_score=False, random_state=2019, verbose=0, warm_start=False)
-    The train_score is 0.8773705614469083.
+    DecisionTreeClassifier(class_weight=None, criterion='gini', max_depth=9,
+                max_features=None, max_leaf_nodes=None,
+                min_impurity_decrease=0.0, min_impurity_split=None,
+                min_samples_leaf=1, min_samples_split=2,
+                min_weight_fraction_leaf=0.0, presort=False, random_state=2019,
+                splitter='best')
+    The train_score is 0.8712414374216044.
+    The cv_socre is 0.6071130243223998.
+    
+    AdaBoostClassifier(algorithm='SAMME.R', base_estimator=None,
+              learning_rate=0.1, n_estimators=50, random_state=2019)
+    The train_score is 0.5649498019899623.
     The cv_socre is 0.704743802857166.
     
     GradientBoostingClassifier(criterion='friedman_mse', init=None,
@@ -6162,6 +4398,15 @@ for keys in clf_tree.keys():
                   verbose=0, warm_start=False)
     The train_score is 0.9.
     The cv_socre is 0.7785578521428747.
+    
+    ExtraTreesClassifier(bootstrap=False, class_weight=None, criterion='gini',
+               max_depth=9, max_features='auto', max_leaf_nodes=None,
+               min_impurity_decrease=0.0, min_impurity_split=None,
+               min_samples_leaf=1, min_samples_split=2,
+               min_weight_fraction_leaf=0.0, n_estimators=50, n_jobs=None,
+               oob_score=False, random_state=2019, verbose=0, warm_start=False)
+    The train_score is 0.8773705614469083.
+    The cv_socre is 0.704743802857166.
     
     BaggingClassifier(base_estimator=None, bootstrap=True,
              bootstrap_features=False, max_features=1.0, max_samples=1.0,
@@ -6180,20 +4425,6 @@ for keys in clf_tree.keys():
     The train_score is 0.8666666666666666.
     The cv_socre is 0.7785578521428744.
     
-    DecisionTreeClassifier(class_weight=None, criterion='gini', max_depth=9,
-                max_features=None, max_leaf_nodes=None,
-                min_impurity_decrease=0.0, min_impurity_split=None,
-                min_samples_leaf=1, min_samples_split=2,
-                min_weight_fraction_leaf=0.0, presort=False, random_state=2019,
-                splitter='best')
-    The train_score is 0.8712414374216044.
-    The cv_socre is 0.6071130243223998.
-    
-    AdaBoostClassifier(algorithm='SAMME.R', base_estimator=None,
-              learning_rate=0.1, n_estimators=50, random_state=2019)
-    The train_score is 0.5649498019899623.
-    The cv_socre is 0.704743802857166.
-    
     
 
 
@@ -6206,16 +4437,18 @@ plt.ylim(np.min(train_score)-0.05,np.max(train_score)+0.05)
 plt.title('Different tree methods')
 plt.legend(loc='best',fontsize=12)
 for a,b in zip(clf_tree.keys(),train_score):
-    plt.text(a,b+0.025,'%.3f'%(b),ha='center',va='bottom',fontsize=12)
+    plt.text(a,b+0.025,'%.4f'%(b),ha='center',va='bottom',fontsize=8)
 for a,b in zip(clf_tree.keys(),cv_score):
-    plt.text(a,b+0.025,'%.3f'%(b),ha='center',va='bottom',fontsize=12)
+    plt.text(a,b+0.025,'%.4f'%(b),ha='center',va='bottom',fontsize=8)
 plt.tight_layout()
 ##Bagging默认就是决策树做基分类器
 ```
 
 
-![png](output_115_0.png)
+![png](output_117_0.png)
 
+
+由图可以看出，RF和Bagging分数一样，因为Bagging默认也使用决策树做基分类器，即还是此时的Bagging就是一个RF
 
 ## svm
 
