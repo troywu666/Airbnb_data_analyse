@@ -1,6 +1,8 @@
-**Airbnb订房预测**
+# Airbnb订房地点预测
 
 便签：SVM、随机森林、XGBoost的对比
+
+[TOC]
 
 ## 1、Data_Exploring
 
@@ -1654,8 +1656,8 @@ print ("The cv score is: {}\n".format(cv_score_xgb))
 
 
 ​    
-    The training score is: 0.8611696272068172
-    The cv score is: 0.7935429602707533
+​    The training score is: 0.8611696272068172
+​    The cv score is: 0.7935429602707533
 
 
 ​    
