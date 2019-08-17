@@ -4,7 +4,17 @@
 
 [TOC]
 
-## 1、Data_Exploring
+## 1、背景和目标
+
+背景：在Airbnb上用户可以预定涵盖34,000+ 城市的酒店进行居住。通过精准预测用户的首次预定地点，可以为用户提供更多个人推荐信息，提升用户的预定体验和提高平台的知名度。
+
+目标：根据所提供的数据建立ML模型，预测用户的首次订房地点
+
+## 2、分析方法
+
+分别使用SVM、随机森林、GBDT的机器学习模型进行建模，对比三种模型的效果，选出相对优的模型
+
+## 3、Data_Exploring
 
 
 ```python
@@ -149,9 +159,7 @@ msno.heatmap(train[missing_col])
 
 ![png](README/output_14_1.png)
 
-### 2、Explore Each Feature
-
-#### 2.1、date_account_created
+### 3.1、date_account_created
 
 
 ```python
@@ -190,7 +198,7 @@ plt.title('Accounts created vs day'
 
 ![png](README/output_21_1.png)
 
-#### 2.2、timestamp_first_active
+### 3.2、timestamp_first_active
 
 * 将object数据类型转换为时间数据类型，方便后续建模分析
 
@@ -201,7 +209,7 @@ tfa_train=train.timestamp_first_active.map(lambda x: datetime.datetime.strptime(
 tfa_train.head()
 ```
 
-#### 2.3、age
+### 3.3、age
 
 * 将年龄数据分段并可视化
 
@@ -229,7 +237,7 @@ ax1.set_ylabel('counts')
 
 ![png](README/output_28_1.png)
 
-#### 2.4、Categorical features
+### 3.4、Categorical features
 
 * 将分类数据的分布情况可视化
 
@@ -308,7 +316,7 @@ for feat in cate_feats:
 
 ![png](README/output_30_9.png)
 
-## 2、 Feature_Enginnering
+## 4、 Feature_Enginnering
 
 
 ```python
@@ -328,7 +336,7 @@ import seaborn as sns
 %matplotlib inline
 ```
 
-### 2.1、session数据集
+### 4.1、session数据集
 
 ```python
 df_session['id']=df_session['user_id']
@@ -447,7 +455,7 @@ df_agg_sess['id']=samp_id
 df_agg_sess.index=df_agg_sess.id
 ```
 
-### 2.2、train和test数据集
+### 4.2、train和test数据集
 
 
 ```python
@@ -462,7 +470,7 @@ test.drop(['date_first_booking'],axis=1,inplace=True)
 df=pd.concat([train,test],axis=0,ignore_index=True)
 ```
 
-#### 2.2.1、timestamp_first_active
+#### 4.2.1、timestamp_first_active
 
 
 ```python
@@ -506,7 +514,7 @@ df.drop('tfa_season',axis=1,inplace=True)
 
 
 
-#### 2.2.2、date_account_created
+#### 4.2.2、date_account_created
 
 
 ```python
@@ -549,7 +557,7 @@ df=pd.concat([df,df_dac_wd,df_dac_season],axis=1)
 
 
 
-#### 2.2.3、time span between dac and tfa
+#### 4.2.3、time span between dac and tfa
 
 
 ```python
@@ -595,7 +603,7 @@ df.drop('span',axis=1,inplace=True)
 df.drop(['date_account_created','timestamp_first_active'],axis=1,inplace=True)
 ```
 
-#### 2.2.4、age
+#### 4.2.4、age
 
 
 ```python
@@ -625,7 +633,7 @@ df=pd.concat([df,age_types],axis=1)
 df.drop(['age','age_type'],axis=1,inplace=True)
 ```
 
-#### 2.2.5、categorical features
+#### 4.2.5、categorical features
 
 
 ```python
@@ -645,7 +653,7 @@ for i in feat_toOHE:
     df.drop(i,axis=1,inplace=True)
 ```
 
-#### 2.2.6、merge with session
+#### 4.2.6、merge with session
 
 ----
 
@@ -680,7 +688,7 @@ df_all.fillna(-2,inplace=True)
 df_all.drop('id',axis=1,inplace=True)
 ```
 
-#### 2.2.7、split train and test datasets
+#### 4.2.7、split train and test datasets
 
 
 ```python
@@ -700,7 +708,7 @@ Xtest.to_csv('Airbnb_xtest.csv')
 labels.tofile('Airbnb_ytrain.csv',sep='\n',format='%s')
 ```
 
-## 3、Modeling
+## 5、Modeling
 
 
 ```python
@@ -758,7 +766,7 @@ xtrain_new_stdsca=X_Scaler.fit_transform(xtrain_new.astype('float64'))
 ##若不使用astype('float64'),会产生warning，因为传入的是int类型数据
 ```
 
-### 3.1、Airbnb Evaluation: NDCG
+### 5.1、Airbnb Evaluation: NDCG
 
 
 ```python
@@ -796,9 +804,9 @@ def ndcg(ground_truth,predictions,k=5):
     return np.mean(scores)
 ```
 
-### 3.2、logistic regression
+### 5.2、logistic regression
 
-#### 3.2.1、模型拟合
+#### 5.2.1、模型拟合
 
 
 ```python
@@ -849,7 +857,7 @@ print('Testing ndcg scoring is ',np.mean(cv_logs_score))
     Training ndcg scoring is  0.7561098398521395
     Testing ndcg scoring is  0.6309297535714575
 
-#### 3.2.2、迭代次数对比
+#### 5.2.2、迭代次数对比
 
 
 ```python
@@ -895,32 +903,10 @@ for max_iter in iteration:
     The max_iter is 1
 
 
-    E:\ProgramData\Anaconda3\envs\tensorflow35\lib\site-packages\sklearn\utils\optimize.py:203: ConvergenceWarning: newton-cg failed to converge. Increase the number of iterations.
-      "number of iterations.", ConvergenceWarning)
-    E:\ProgramData\Anaconda3\envs\tensorflow35\lib\site-packages\sklearn\utils\optimize.py:203: ConvergenceWarning: newton-cg failed to converge. Increase the number of iterations.
-      "number of iterations.", ConvergenceWarning)
-    E:\ProgramData\Anaconda3\envs\tensorflow35\lib\site-packages\sklearn\utils\optimize.py:203: ConvergenceWarning: newton-cg failed to converge. Increase the number of iterations.
-      "number of iterations.", ConvergenceWarning)
-    E:\ProgramData\Anaconda3\envs\tensorflow35\lib\site-packages\sklearn\utils\optimize.py:203: ConvergenceWarning: newton-cg failed to converge. Increase the number of iterations.
-      "number of iterations.", ConvergenceWarning)
-    E:\ProgramData\Anaconda3\envs\tensorflow35\lib\site-packages\sklearn\utils\optimize.py:203: ConvergenceWarning: newton-cg failed to converge. Increase the number of iterations.
-      "number of iterations.", ConvergenceWarning)
-
-
     Training ndcg scoring is  0.757425485443312
     Testing ndcg scoring is  0.5342151580451073 .
     
     The max_iter is 20
-
-
-    E:\ProgramData\Anaconda3\envs\tensorflow35\lib\site-packages\sklearn\utils\optimize.py:203: ConvergenceWarning: newton-cg failed to converge. Increase the number of iterations.
-      "number of iterations.", ConvergenceWarning)
-    E:\ProgramData\Anaconda3\envs\tensorflow35\lib\site-packages\sklearn\utils\optimize.py:203: ConvergenceWarning: newton-cg failed to converge. Increase the number of iterations.
-      "number of iterations.", ConvergenceWarning)
-    E:\ProgramData\Anaconda3\envs\tensorflow35\lib\site-packages\sklearn\utils\optimize.py:203: ConvergenceWarning: newton-cg failed to converge. Increase the number of iterations.
-      "number of iterations.", ConvergenceWarning)
-    E:\ProgramData\Anaconda3\envs\tensorflow35\lib\site-packages\sklearn\utils\optimize.py:203: ConvergenceWarning: newton-cg failed to converge. Increase the number of iterations.
-      "number of iterations.", ConvergenceWarning)
 
 
     Training ndcg scoring is  0.7744951619561935
@@ -970,9 +956,9 @@ plt.tight_layout()
 
 ![png](README/output_118_0.png)
 
-### 3.3、Tree method
+### 5.3、Tree method
 
-#### 3.3.1、随机森林模型不同数量分类器效果对比
+#### 5.3.1、随机森林模型不同数量分类器效果对比
 
 
 ```python
@@ -1141,7 +1127,7 @@ plt.tight_layout()
 
 ![png](README/output_122_0.png)
 
-#### 3.3.2、各种树模型拟合效果对比
+#### 5.3.2、各种树模型拟合效果对比
 
 
 ```python
@@ -1333,7 +1319,7 @@ plt.tight_layout()
 
 由图可以看出，RF和Bagging分数一样，因为Bagging默认也使用决策树做基分类器，即还是此时的Bagging就是一个RF
 
-### 3.4、SVM
+### 5.4、SVM
 
 
 ```python
@@ -1421,28 +1407,12 @@ for key in clf_svm.keys():
       tol=0.0001, verbose=False)
 
 
-    E:\ProgramData\Anaconda3\envs\tensorflow35\lib\site-packages\sklearn\svm\base.py:244: ConvergenceWarning: Solver terminated early (max_iter=1000).  Consider pre-processing your data with StandardScaler or MinMaxScaler.
-      % self.max_iter, ConvergenceWarning)
-
-
     Training score is 0.699445372966201.
     Cv score is 0.6916810757011943.
     SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0,
       decision_function_shape='ovr', degree=3, gamma='auto', kernel='linear',
       max_iter=1000, probability=False, random_state=2019, shrinking=True,
       tol=0.0001, verbose=False)
-
-
-    E:\ProgramData\Anaconda3\envs\tensorflow35\lib\site-packages\sklearn\svm\base.py:244: ConvergenceWarning: Solver terminated early (max_iter=1000).  Consider pre-processing your data with StandardScaler or MinMaxScaler.
-      % self.max_iter, ConvergenceWarning)
-    E:\ProgramData\Anaconda3\envs\tensorflow35\lib\site-packages\sklearn\svm\base.py:244: ConvergenceWarning: Solver terminated early (max_iter=1000).  Consider pre-processing your data with StandardScaler or MinMaxScaler.
-      % self.max_iter, ConvergenceWarning)
-    E:\ProgramData\Anaconda3\envs\tensorflow35\lib\site-packages\sklearn\svm\base.py:244: ConvergenceWarning: Solver terminated early (max_iter=1000).  Consider pre-processing your data with StandardScaler or MinMaxScaler.
-      % self.max_iter, ConvergenceWarning)
-    E:\ProgramData\Anaconda3\envs\tensorflow35\lib\site-packages\sklearn\svm\base.py:244: ConvergenceWarning: Solver terminated early (max_iter=1000).  Consider pre-processing your data with StandardScaler or MinMaxScaler.
-      % self.max_iter, ConvergenceWarning)
-    E:\ProgramData\Anaconda3\envs\tensorflow35\lib\site-packages\sklearn\svm\base.py:244: ConvergenceWarning: Solver terminated early (max_iter=1000).  Consider pre-processing your data with StandardScaler or MinMaxScaler.
-      % self.max_iter, ConvergenceWarning)
 
 
     Training score is 0.7230926385141765.
@@ -1453,18 +1423,6 @@ for key in clf_svm.keys():
       tol=0.0001, verbose=False)
 
 
-    E:\ProgramData\Anaconda3\envs\tensorflow35\lib\site-packages\sklearn\svm\base.py:244: ConvergenceWarning: Solver terminated early (max_iter=1000).  Consider pre-processing your data with StandardScaler or MinMaxScaler.
-      % self.max_iter, ConvergenceWarning)
-    E:\ProgramData\Anaconda3\envs\tensorflow35\lib\site-packages\sklearn\svm\base.py:244: ConvergenceWarning: Solver terminated early (max_iter=1000).  Consider pre-processing your data with StandardScaler or MinMaxScaler.
-      % self.max_iter, ConvergenceWarning)
-    E:\ProgramData\Anaconda3\envs\tensorflow35\lib\site-packages\sklearn\svm\base.py:244: ConvergenceWarning: Solver terminated early (max_iter=1000).  Consider pre-processing your data with StandardScaler or MinMaxScaler.
-      % self.max_iter, ConvergenceWarning)
-    E:\ProgramData\Anaconda3\envs\tensorflow35\lib\site-packages\sklearn\svm\base.py:244: ConvergenceWarning: Solver terminated early (max_iter=1000).  Consider pre-processing your data with StandardScaler or MinMaxScaler.
-      % self.max_iter, ConvergenceWarning)
-    E:\ProgramData\Anaconda3\envs\tensorflow35\lib\site-packages\sklearn\svm\base.py:244: ConvergenceWarning: Solver terminated early (max_iter=1000).  Consider pre-processing your data with StandardScaler or MinMaxScaler.
-      % self.max_iter, ConvergenceWarning)
-
-
     Training score is 0.7547611590601255.
     Cv score is 0.7437424511720637.
     LinearSVC(C=1.0, class_weight=None, dual=True, fit_intercept=True,
@@ -1473,22 +1431,8 @@ for key in clf_svm.keys():
          verbose=0)
 
 
-    E:\ProgramData\Anaconda3\envs\tensorflow35\lib\site-packages\sklearn\svm\base.py:922: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
-      "the number of iterations.", ConvergenceWarning)
-    E:\ProgramData\Anaconda3\envs\tensorflow35\lib\site-packages\sklearn\svm\base.py:922: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
-      "the number of iterations.", ConvergenceWarning)
-    E:\ProgramData\Anaconda3\envs\tensorflow35\lib\site-packages\sklearn\svm\base.py:922: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
-      "the number of iterations.", ConvergenceWarning)
-    E:\ProgramData\Anaconda3\envs\tensorflow35\lib\site-packages\sklearn\svm\base.py:922: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
-      "the number of iterations.", ConvergenceWarning)
-
-
     Training score is 0.7520617701057801.
     Cv score is 0.5209215841106466.
-
-
-    E:\ProgramData\Anaconda3\envs\tensorflow35\lib\site-packages\sklearn\svm\base.py:922: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
-      "the number of iterations.", ConvergenceWarning)
 
 
 
